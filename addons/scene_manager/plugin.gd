@@ -1,7 +1,7 @@
 @tool
 extends EditorPlugin
 
-var menu: Node
+var _menu: Node
 
 const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
 const DEFAULT_PATH_TO_SCENES := "res://addons/scene_manager/scenes.gd"
@@ -25,22 +25,15 @@ func set_properties_for_setting():
 
 # Plugin installation
 func _enter_tree():
-	var path_to_scenes = DEFAULT_PATH_TO_SCENES
-	
 	# Adding settings property to Project/Settings & loading
 	if !ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
 		ProjectSettings.set_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH_TO_SCENES)
-		set_properties_for_setting()
-	else:
-		path_to_scenes = ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME)
-		set_properties_for_setting()
 	
-	add_autoload_singleton("SceneManager", "res://addons/scene_manager/scene_manager.tscn")
-	add_autoload_singleton("Scenes", path_to_scenes)
-	menu = preload("res://addons/scene_manager/editor/menu.tscn").instantiate()
-	menu.name = "Scene Manager"
-
-	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, menu)
+	set_properties_for_setting()
+	_menu = preload("res://addons/scene_manager/editor/menu.tscn").instantiate()
+	_menu.name = "Scene Manager"
+	
+	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, _menu)
 
 # Plugin uninstallation
 func _exit_tree():
@@ -53,7 +46,19 @@ func _exit_tree():
 	# ProjectSettings.clear(SETTINGS_PROPERTY_NAME)
 	#
 	# We just don't remove the settings for now
+	remove_control_from_docks(_menu)
+	_menu.free()
+
+
+func _enable_plugin():
+	var path_to_scenes = DEFAULT_PATH_TO_SCENES
+	if ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
+		path_to_scenes = ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME)
+	
+	add_autoload_singleton("SceneManager", "res://addons/scene_manager/scene_manager.tscn")
+	add_autoload_singleton("Scenes", path_to_scenes)
+
+
+func _disable_plugin():
 	remove_autoload_singleton("SceneManager")
 	remove_autoload_singleton("Scenes")
-	remove_control_from_docks(menu)
-	menu.free()

@@ -1,7 +1,7 @@
 extends Control
 
-var t = Timer.new()
-var count = 0
+var t := Timer.new()
+var count: int = 0
 
 func _ready():
 	self.add_child(t)
