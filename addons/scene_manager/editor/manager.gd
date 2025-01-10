@@ -11,8 +11,8 @@ const comment: String = "#\n# Please do not edit anything in this script\n#\n# J
 const extend_part: String = "extends Node\n\n"
 const var_part: String = "var scenes: Dictionary = "
 # scene item, ignore item
-const _ignore_item = preload("res://addons/scene_manager/ignore_item.tscn")
-const _scene_list_item = preload("res://addons/scene_manager/scene_list.tscn")
+const _ignore_item = preload("res://addons/scene_manager/editor/ignore_item.tscn")
+const _scene_list_item = preload("res://addons/scene_manager/editor/scene_list.tscn")
 # icons
 const _hide_button_checked = preload("res://addons/scene_manager/icons/GuiChecked.svg")
 const _hide_button_unchecked = preload("res://addons/scene_manager/icons/GuiCheckedDisabled.svg")

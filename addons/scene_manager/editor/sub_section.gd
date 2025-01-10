@@ -9,7 +9,7 @@ extends Control
 const _open = preload("res://addons/scene_manager/icons/GuiOptionArrowDown.svg")
 const _close = preload("res://addons/scene_manager/icons/GuiOptionArrowRight.png")
 # Instances
-const _scene_item = preload("res://addons/scene_manager/scene_item.tscn")
+const _scene_item = preload("res://addons/scene_manager/editor/scene_item.tscn")
 # root
 var _root: Node = self
 

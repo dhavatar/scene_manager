@@ -2,8 +2,8 @@
 extends Node
 
 # Scene itema and sub_section to instance and add in list
-const _scene_item = preload("res://addons/scene_manager/scene_item.tscn")
-const _sub_section = preload("res://addons/scene_manager/sub_section.tscn")
+const _scene_item = preload("res://addons/scene_manager/editor/scene_item.tscn")
+const _sub_section = preload("res://addons/scene_manager/editor/sub_section.tscn")
 # Duplicate + normal scene theme
 const _duplicate_line_edit: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
 # Open close icons

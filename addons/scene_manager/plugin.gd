@@ -37,7 +37,7 @@ func _enter_tree():
 	
 	add_autoload_singleton("SceneManager", "res://addons/scene_manager/scene_manager.tscn")
 	add_autoload_singleton("Scenes", path_to_scenes)
-	menu = preload("res://addons/scene_manager/menu.tscn").instantiate()
+	menu = preload("res://addons/scene_manager/editor/menu.tscn").instantiate()
 	menu.name = "Scene Manager"
 
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, menu)

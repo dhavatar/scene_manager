@@ -2,8 +2,6 @@ extends Node
 
 # consts
 const FADE: String = "fade"
-const COLOR: String = "color"
-const NO_COLOR: String = "no_color"
 const BLACK: Color = Color(0, 0, 0)
 # variables
 @onready var _fade_color_rect: ColorRect = find_child("fade")
@@ -56,31 +54,10 @@ func _set_current_scene() -> void:
 	if _current_scene == "":
 		push_warning("loaded scene is ignored by scene manager, it means that you can not go back to this scene by 'back' key word.")
 
-# gets patterns from `addons/scene_manager/shader_patterns`
-func _get_patterns() -> void:
-	var root_path: String = "res://addons/scene_manager/shader_patterns/"
-	var dir := DirAccess.open(root_path)
-	if dir:
-		dir.list_dir_begin()
-
-		while true:
-			var file_folder: String = dir.get_next()
-			if file_folder == "":
-				break
-			elif file_folder.get_extension() == "import":
-				file_folder = file_folder.replace(".import", "")
-			if file_folder.get_extension() == "png":
-				var key = file_folder.replace("."+file_folder.get_extension(), "")
-				if !(key in _patterns.keys()):
-					_patterns[key] = load(root_path + file_folder)
-
-		dir.list_dir_end()
-
 # set current scene and get patterns from `addons/scene_manager/shader_patterns` folder
 func _ready() -> void:
 	set_process(false)
 	_set_current_scene()
-	_get_patterns()
 
 # `speed` unit is in seconds
 func _fade_in(speed: float) -> bool:
@@ -212,24 +189,8 @@ func _set_clickable(clickable: bool) -> void:
 # sets color if timeout exists
 func _timeout(timeout: float) -> bool:
 	if timeout != 0:
-		_animation_player.play(COLOR, -1, 1, false)
 		return true
 	return false
-
-# sets properties for transitions
-func _set_pattern(options: Options, general_options: GeneralOptions) -> void:
-	if !(options.fade_pattern in _patterns):
-		options.fade_pattern = "fade"
-	if options.fade_pattern == "fade":
-		_fade_color_rect.material.set_shader_parameter("linear_fade", true)
-		_fade_color_rect.material.set_shader_parameter("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
-		_fade_color_rect.material.set_shader_parameter("custom_texture", null)
-	else:
-		_fade_color_rect.material.set_shader_parameter("linear_fade", false)
-		_fade_color_rect.material.set_shader_parameter("custom_texture", _patterns[options.fade_pattern])
-		_fade_color_rect.material.set_shader_parameter("inverted", options.inverted)
-		_fade_color_rect.material.set_shader_parameter("smoothness", options.smoothness)
-		_fade_color_rect.material.set_shader_parameter("color", Vector3(general_options.color.r, general_options.color.g, general_options.color.b))
 
 # used for interactive change scene
 func _process(_delta: float):
@@ -323,7 +284,6 @@ func show_first_scene(fade_in_options: Options, general_options: GeneralOptions)
 		_first_time = false
 		_set_in_transition()
 		_set_clickable(general_options.clickable)
-		_set_pattern(fade_in_options, general_options)
 		if _timeout(general_options.timeout):
 			await get_tree().create_timer(general_options.timeout).timeout
 		if _fade_in(fade_in_options.fade_speed):
@@ -369,7 +329,6 @@ func change_scene(scene, fade_out_options: Options, fade_in_options: Options, ge
 		_first_time = false
 		_set_in_transition()
 		_set_clickable(general_options.clickable)
-		_set_pattern(fade_out_options, general_options)
 		if _fade_out(fade_out_options.fade_speed):
 			await _animation_player.animation_finished
 			fade_out_finished.emit()
@@ -379,8 +338,6 @@ func change_scene(scene, fade_out_options: Options, fade_in_options: Options, ge
 			scene_changed.emit()
 		if _timeout(general_options.timeout):
 			await get_tree().create_timer(general_options.timeout).timeout
-		_animation_player.play(NO_COLOR, -1, 1, false)
-		_set_pattern(fade_in_options, general_options)
 		if _fade_in(fade_in_options.fade_speed):
 			await _animation_player.animation_finished
 			fade_in_finished.emit()
@@ -421,7 +378,6 @@ func add_loaded_scene_to_scene_tree() -> void:
 func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
-	_set_pattern(fade_out_options, general_options)
 	if _fade_out(fade_out_options.fade_speed):
 		await _animation_player.animation_finished
 		fade_out_finished.emit()
@@ -441,8 +397,6 @@ func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fad
 	# timeout and ...
 	if _timeout(general_options.timeout):
 		await get_tree().create_timer(general_options.timeout).timeout
-	_animation_player.play(NO_COLOR, -1, 1, false)
-	_set_pattern(fade_in_options, general_options)
 	if _fade_in(fade_in_options.fade_speed):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
@@ -516,7 +470,6 @@ func get_recorded_scene() -> String:
 func pause(fade_out_options: Options, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
-	_set_pattern(fade_out_options, general_options)
 	if _fade_out(fade_out_options.fade_speed):
 		await _animation_player.animation_finished
 		fade_out_finished.emit()
@@ -524,7 +477,6 @@ func pause(fade_out_options: Options, general_options: GeneralOptions) -> void:
 ## resume (fadein) after pause
 func resume(fade_in_options: Options, general_options: GeneralOptions) -> void:
 	_set_clickable(general_options.clickable)
-	_set_pattern(fade_in_options, general_options)
 	if _fade_in(fade_in_options.fade_speed):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
