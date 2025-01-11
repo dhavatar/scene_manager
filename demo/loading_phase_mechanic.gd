@@ -3,10 +3,12 @@ extends Control
 var t := Timer.new()
 var count: int = 0
 
+
 func _ready():
 	self.add_child(t)
 	t.timeout.connect(_on_timeout)
 	t.start(1)
+
 
 func _on_timeout():
 	count += 1

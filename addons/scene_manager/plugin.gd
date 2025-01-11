@@ -6,6 +6,7 @@ var _menu: Node
 const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
 const DEFAULT_PATH_TO_SCENES := "res://addons/scene_manager/scenes.gd"
 
+
 func set_properties_for_setting():
 	var property_info = {
 		"name": SETTINGS_PROPERTY_NAME,
@@ -23,6 +24,7 @@ func set_properties_for_setting():
 	
 	ProjectSettings.save()
 
+
 # Plugin installation
 func _enter_tree():
 	# Adding settings property to Project/Settings & loading
@@ -34,6 +36,7 @@ func _enter_tree():
 	_menu.name = "Scene Manager"
 	
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, _menu)
+
 
 # Plugin uninstallation
 func _exit_tree():
