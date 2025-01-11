@@ -1,6 +1,6 @@
 extends Button
 
-@export var scene: Scenes.SceneName
+@export var scene: Scenes.SceneName = Scenes.SceneName.NONE
 @export var fade_out_speed: float = 1.0
 @export var fade_in_speed: float = 1.0
 @export var fade_out_pattern: String = "fade"
@@ -41,3 +41,15 @@ func _on_pause_and_resume_button_up():
 	await SceneManager.pause(fade_out_options, general_options)
 	await get_tree().create_timer(3).timeout
 	await SceneManager.resume(fade_in_options, general_options)
+
+
+func _on_back_pressed() -> void:
+	SceneManager.go_back()
+
+
+func _on_reload_pressed() -> void:
+	SceneManager.reload_current_scene()
+
+
+func _on_exit_pressed() -> void:
+	SceneManager.exit_game()

@@ -41,6 +41,7 @@ text = "LOADING
 
 SCREEN"
 script = ExtResource("1")
+scene = 3
 fade_in_speed = 2.0
 fade_out_pattern = "scribbles"
 fade_in_pattern = "crooked_tiles"
@@ -145,8 +146,8 @@ layout_mode = 2
 [connection signal="button_up" from="CenterContainer/VBoxContainer/loading_scene" to="CenterContainer/VBoxContainer/loading_scene" method="_on_loading_scene_button_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/next_scene" to="CenterContainer/VBoxContainer/HBoxContainer/next_scene" method="_on_button_button_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reset" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reset" method="_on_reset_button_up"]
-[connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" method="_on_button_button_up"]
-[connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" method="_on_button_button_up"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" method="_on_reload_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" method="_on_back_pressed"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/nothing" to="CenterContainer/VBoxContainer/nothing" method="_on_button_button_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/pause_and_resume" to="CenterContainer/VBoxContainer/loading_scene" method="_on_pause_and_resume_button_up"]
-[connection signal="button_up" from="CenterContainer/VBoxContainer/exit" to="CenterContainer/VBoxContainer/exit" method="_on_button_button_up"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/exit" to="CenterContainer/VBoxContainer/exit" method="_on_exit_pressed"]

@@ -11,10 +11,10 @@ const FADE: String = "fade"
 @onready var _current_scene: Scenes.SceneName = Scenes.SceneName.NONE
 @onready var _first_time: bool = true
 @onready var _patterns: Dictionary = {}
-@onready var _reserved_keys: Array = ["none", "back", "null", "ignore", "refresh",
-	"reload", "restart", "exit", "quit"]
+@onready var _reserved_keys: Array = ["none"]
 
-var _load_scene: String = ""
+var _load_scene: String = "" ## Scene path that is currently loading
+var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of the scene that's currently loading
 var _load_progress: Array = []
 var _recorded_scene: Scenes.SceneName = Scenes.SceneName.NONE
 
@@ -69,8 +69,9 @@ func _ready() -> void:
 func _fade_in(speed: float) -> bool:
 	if speed == 0:
 		return false
+	
 	fade_in_started.emit()
-	_animation_player.play(FADE, -1, 1 / speed, false)
+	_animation_player.play(FADE, -1, -1 / speed, true)
 	return true
 
 
@@ -78,8 +79,9 @@ func _fade_in(speed: float) -> bool:
 func _fade_out(speed: float) -> bool:
 	if speed == 0:
 		return false
+
 	fade_out_started.emit()
-	_animation_player.play(FADE, -1, -1 / speed, true)
+	_animation_player.play(FADE, -1, 1 / speed, false)
 	return true
 
 
@@ -174,7 +176,7 @@ func _timeout(timeout: float) -> bool:
 
 
 # used for interactive change scene
-func _process(_delta: float):
+func _process(_delta: float) -> void:
 	var prevPercent: int = 0
 	if len(_load_progress) != 0:
 		prevPercent = int(_load_progress[0] * 100)
@@ -195,12 +197,12 @@ func _process(_delta: float):
 
 
 ## Limits how deep the scene manager is allowed to record previous scenes which
-## affects in changing scene to `back`(previous scene) functionality.
+## affects in changing scene to `back`(previous scene) functionality.[br]
 ##
-## allowed `input` values:
-## input = -1 => unlimited (default)
-## input =  0 => we can not go back to any previos scenes
-## input >  0 => we can go back to `input` or less previous scenes
+## allowed `input` values:[br]
+## input = -1 => unlimited (default)[br]
+## input =  0 => we can not go back to any previous scenes[br]
+## input >  0 => we can go back to `input` or less previous scenes[br]
 func set_back_limit(input: int) -> void:
 	input = maxi(input, -1) # Clamp the value to a minimum of -1
 	_back_buffer_limit = input
@@ -228,7 +230,8 @@ func create_options(fade_speed: float = 1.0, fade_pattern: String = "fade", smoo
 	return options
 
 
-## Creates options for common properties in transition
+## Creates options for common properties in transition.[br]
+##
 ## add_to_back means that you can go back to the scene if you
 ## change scene to `back` scene
 func create_general_options(color: Color = Color(0, 0, 0), timeout: float = 0.0, clickable: bool = true, add_to_back: bool = true) -> GeneralOptions:
@@ -240,31 +243,31 @@ func create_general_options(color: Color = Color(0, 0, 0), timeout: float = 0.0,
 	return options
 
 
-## Returns scene instance of passed scene key (blocking).
+## Returns scene instance of passed scene key (blocking).[br]
 ##
 ## Note: you can activate `use_sub_threads` but just know that In the newest 
 ## versions of Godot there seems to be a bug that can cause a threadlock in
 ## the resource loader that will result in infinite loading of the scene 
-## without any error.
+## without any error.[br]
 ##
-## Related Github Issues About `use_sub_threads`:
+## Related Github Issues About `use_sub_threads`:[br]
 ##
-## https://github.com/godotengine/godot/issues/85255
+## https://github.com/godotengine/godot/issues/85255[br]
 ## https://github.com/godotengine/godot/issues/84012
 func create_scene_instance(key: Scenes.SceneName, use_sub_threads = false) -> Node:
 	return get_scene(key, use_sub_threads).instantiate()
 
 
-## Returns PackedScene of passed scene key (blocking)
+## Returns PackedScene of passed scene key (blocking).[br]
 ##
 ## Note: you can activate `use_sub_threads` but just know that In the newest 
 ## versions of Godot there seems to be a bug that can cause a threadlock in
 ## the resource loader that will result in infinite loading of the scene 
-## without any error.
+## without any error.[br]
 ##
-## Related Github Issues About `use_sub_threads`:
+## Related Github Issues About `use_sub_threads`:[br]
 ##
-## https://github.com/godotengine/godot/issues/85255
+## https://github.com/godotengine/godot/issues/85255[br]
 ## https://github.com/godotengine/godot/issues/84012
 func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
 	var address = Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"]
@@ -272,15 +275,15 @@ func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
 	return ResourceLoader.load_threaded_get(address)
 
 
-## Changes current scene to the next scene.
+## Changes current scene to the specified scene.
 func change_scene(scene: Scenes.SceneName, fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
 	_first_time = false
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
 
-	#if _fade_out(fade_out_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_out_finished.emit()
+	if _fade_out(fade_out_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_out_finished.emit()
 
 	if _change_scene(scene, general_options.add_to_back):
 		await get_tree().node_added
@@ -289,22 +292,37 @@ func change_scene(scene: Scenes.SceneName, fade_out_options: Options, fade_in_op
 	if _timeout(general_options.timeout):
 		await get_tree().create_timer(general_options.timeout).timeout
 	
-	#if _fade_in(fade_in_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_in_finished.emit()
+	if _fade_in(fade_in_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_in_finished.emit()
 
 	_set_clickable(true)
 	_set_out_transition()
 
 
-## Change scene with no effect
-func no_effect_change_scene(scene: Scenes.SceneName, hold_timeout: float = 0.0, add_to_back: bool = true):
+## Change scene with no effect.
+func no_effect_change_scene(scene: Scenes.SceneName, hold_timeout: float = 0.0, add_to_back: bool = true) -> void:
 	_first_time = false
 	_set_in_transition()
 	await get_tree().create_timer(hold_timeout).timeout
 	if _change_scene(scene, add_to_back):
 		await get_tree().node_added
 	_set_out_transition()
+
+
+## Changes the scene to the previous.
+func go_back() -> void:
+	_back()
+
+
+## Reload the currently loaded scene.
+func reload_current_scene() -> void:
+	_refresh()
+
+
+# Exits the game completely.
+func exit_game() -> void:
+	get_tree().quit(0)
 
 
 ## Imports loaded scene into the scene tree but doesn't change the scene
@@ -323,6 +341,7 @@ func add_loaded_scene_to_scene_tree() -> void:
 			root.add_child(scene)
 			root.move_child(scene, root.get_child_count() - 2)
 			_load_scene = ""
+			_load_scene_enum = Scenes.SceneName.NONE
 
 
 ## When you added the loaded scene to the scene tree by `add_loaded_scene_to_scene_tree`
@@ -331,9 +350,10 @@ func add_loaded_scene_to_scene_tree() -> void:
 func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
-	#if _fade_out(fade_out_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_out_finished.emit()
+	
+	if _fade_out(fade_out_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_out_finished.emit()
 
 	# actual change scene goes here
 	var root = get_tree().get_root()
@@ -354,34 +374,36 @@ func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fad
 	if _timeout(general_options.timeout):
 		await get_tree().create_timer(general_options.timeout).timeout
 	
-	#if _fade_in(fade_in_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_in_finished.emit()
+	if _fade_in(fade_in_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_in_finished.emit()
+
 	_set_clickable(true)
 	_set_out_transition()
 
 
-## Loads scene interactive
+## Loads scene interactive[br]
 ##
 ## Connect to `load_percent_changed(value: int)` and `load_finished` signals
-## to listen to updates on your scene loading status
+## to listen to updates on your scene loading status.[br]
 ##
 ## Note: You can activate `use_sub_threads` but just know that in the newest 
 ## versions of Godot there seems to be a bug that can cause a threadlock in
 ## the resource loader that will result in infinite loading of the scene 
-## without any error.
+## without any error.[br]
 ##
-## Related Github Issues About `use_sub_threads`:
-##
-## https://github.com/godotengine/godot/issues/85255
+## Related Github Issues About `use_sub_threads`:[br]
+## 
+## https://github.com/godotengine/godot/issues/85255[br]
 ## https://github.com/godotengine/godot/issues/84012
 func load_scene_interactive(key: Scenes.SceneName, use_sub_threads = false) -> void:
 	set_process(true)
 	_load_scene = _get_scene_value(key)
+	_load_scene_enum = key
 	ResourceLoader.load_threaded_request(_load_scene, "", use_sub_threads, ResourceLoader.CACHE_MODE_IGNORE)
 
 
-## Returns the loaded scene
+## Returns the loaded scene.[br]
 ##
 ## If scene is not loaded, blocks and waits until scene is ready (acts blocking in code
 ## and may freeze your game, make sure scene is ready to get).
@@ -396,7 +418,7 @@ func change_scene_to_loaded_scene(fade_out_options: Options, fade_in_options: Op
 	if _load_scene != "":
 		var scene = ResourceLoader.load_threaded_get(_load_scene) as PackedScene
 		if scene:
-			change_scene(scene, fade_out_options, fade_in_options, general_options)
+			change_scene(_load_scene_enum, fade_out_options, fade_in_options, general_options)
 
 
 ## Returns previous scene (scene before current scene)
@@ -436,16 +458,19 @@ func get_recorded_scene() -> Scenes.SceneName:
 func pause(fade_out_options: Options, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
-	#if _fade_out(fade_out_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_out_finished.emit()
+	
+	if _fade_out(fade_out_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_out_finished.emit()
 
 
 ## Resume (fadein) after pause
 func resume(fade_in_options: Options, general_options: GeneralOptions) -> void:
 	_set_clickable(general_options.clickable)
-	#if _fade_in(fade_in_options.fade_speed):
-	#	await _animation_player.animation_finished
-	#	fade_in_finished.emit()
+	
+	if _fade_in(fade_in_options.fade_speed):
+		await _animation_player.animation_finished
+		fade_in_finished.emit()
+
 	_set_out_transition()
 	_set_clickable(true)

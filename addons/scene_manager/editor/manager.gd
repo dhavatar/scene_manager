@@ -57,8 +57,7 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 #
 # Example: { "res://demo/scene3.tscn": ["Character", "Menu"] }
 var _sections: Dictionary = {}
-var reserved_keys: Array = ["none", "back", "null", "ignore", "refresh",
-	"reload", "restart", "exit", "quit"]
+var reserved_keys: Array = ["none"]
 var _timer: Timer = null;
 
 # UI signal callbacks
