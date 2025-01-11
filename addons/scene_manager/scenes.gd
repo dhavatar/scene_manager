@@ -4,10 +4,10 @@
 #
 extends Node
 
-## [Scene Dictionary]
-var scenes: Dictionary = \
-{"_auto_refresh":true,"_auto_save":true,"_ignore_list":["res://addons"],"_ignores_visible":true,"_scenes":{"loading":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/loading.tscn"},"loading_with_initialization":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/loading_with_initialization.tscn"},"scene1":{"sections":["Scene","Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene1.tscn"},"scene2":{"sections":["Scene"],"settings":{"All":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene2.tscn"},"scene3":{"sections":["Scene"],"settings":{"All":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene3.tscn"},"scene_with_loading_phase":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/scene_with_loading_phase.tscn"}},"_sections":["Scene","Loading"]}
+# [Scene Enum]
+enum SceneName \
+{ NONE = -1, LOADING, LOADING_WITH_INITIALIZATION, SCENE1, SCENE2, SCENE3, SCENE_WITH_LOADING_PHASE, }
 
-## [Scene Enum]
-enum SCENE \
-{loading, loading_with_initialization, scene1, scene2, scene3, scene_with_loading_phase, }
+# [Scene Dictionary]
+var scenes: Dictionary = \
+{"_auto_refresh":true,"_auto_save":true,"_ignore_list":["res://addons"],"_ignores_visible":true,"_scenes":{"loading":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/loading.tscn"},"loading_with_initialization":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/loading_with_initialization.tscn"},"scene1":{"sections":["Scene"],"settings":{"All":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene1.tscn"},"scene2":{"sections":["Scene"],"settings":{"All":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene2.tscn"},"scene3":{"sections":["Scene"],"settings":{"All":{"subsection":"","visibility":true},"Scene":{"subsection":"","visibility":true}},"value":"res://demo/scene3.tscn"},"scene_with_loading_phase":{"sections":["Loading"],"settings":{"All":{"subsection":"","visibility":true},"Loading":{"subsection":"","visibility":true}},"value":"res://demo/scene_with_loading_phase.tscn"}},"_sections":["Scene","Loading"]}

@@ -41,7 +41,6 @@ AND WAIT FOR
 SCENE
 INITIALIZATION"
 script = ExtResource("1")
-scene = "special_scene"
 fade_out_speed = 0.2
 fade_in_speed = 0.0
 fade_in_pattern = "crooked_tiles"
@@ -59,7 +58,6 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "LOADING SCREEN"
 script = ExtResource("1")
-scene = "scene1"
 fade_in_speed = 2.0
 fade_out_pattern = "splashed_dirt"
 fade_in_pattern = "squares"
@@ -81,7 +79,7 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "SCENE 3"
 script = ExtResource("1")
-scene = "scene1"
+scene = 2
 fade_out_pattern = "vertical"
 fade_in_pattern = "pixel"
 fade_out_smoothness = 0.5
@@ -100,7 +98,6 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "RESET"
 script = ExtResource("1")
-scene = "ignore"
 
 [node name="reload" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -109,7 +106,6 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "RELOAD"
 script = ExtResource("1")
-scene = "reload"
 fade_out_speed = 0.2
 fade_in_speed = 0.2
 
@@ -120,7 +116,6 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "BACK"
 script = ExtResource("1")
-scene = "back"
 fade_out_speed = 0.0
 fade_in_speed = 0.0
 
@@ -143,7 +138,6 @@ theme_override_fonts/font = ExtResource("1_e4fv5")
 theme_override_font_sizes/font_size = 32
 text = "EXIT"
 script = ExtResource("1")
-scene = "exit"
 fade_out_speed = 0.3
 
 [node name="check" type="CheckButton" parent="CenterContainer/VBoxContainer"]
