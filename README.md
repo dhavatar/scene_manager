@@ -1,4 +1,16 @@
-# Scene Manager
+# Scene Manager (dahs Edition)
+
+## In Progress
+**Current Changes**:
+- Scenes can be specified as enums now to prevent typo errors using strings
+- Shader is removed to make it not depend ont it, especially for web builds that can conflict.
+- Restructuring files and folder structure
+
+**TODO**:
+- Design API for modular loading screens without hard coding transitions in the scene manager itself
+- Further clean up the code to remove the loading scene related code.
+- Update icon for this addon
+- Update the README with the changes
 
 <p align="center">
 <img src="icon.png"/>
@@ -7,8 +19,6 @@
 A tool to manage transition between different scenes.\
 Scene Manager v1.X.X and v2.X.X is compatible with Godot 3.\
 Scene Manager v3.X.X is compatible with Godot 4.
-
-**Note**: Scene Manager v2.X.X and v1.X.X has heavily less features.
 
 ## Features
 

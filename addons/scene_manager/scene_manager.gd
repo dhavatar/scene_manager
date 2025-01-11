@@ -30,9 +30,6 @@ signal fade_out_finished
 class Options:
 	# based checked seconds
 	var fade_speed: float = 1
-	var fade_pattern: String = "fade"
-	var smoothness: float = 0.1
-	var inverted: bool = false
 
 
 class GeneralOptions:
@@ -221,12 +218,9 @@ func reset_scene_manager() -> void:
 
 
 ## Creates options for fade_out or fade_in transition.
-func create_options(fade_speed: float = 1.0, fade_pattern: String = "fade", smoothness: float = 0.1, inverted: bool = false) -> Options:
+func create_options(fade_speed: float = 1.0) -> Options:
 	var options: Options = Options.new()
 	options.fade_speed = fade_speed
-	options.fade_pattern = fade_pattern
-	options.smoothness = smoothness
-	options.inverted = inverted
 	return options
 
 
