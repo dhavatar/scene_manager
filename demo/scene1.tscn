@@ -1,7 +1,18 @@
-[gd_scene load_steps=3 format=3 uid="uid://4ww1s3pdeqel"]
+[gd_scene load_steps=6 format=3 uid="uid://4ww1s3pdeqel"]
 
 [ext_resource type="Script" path="res://demo/button.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://c5nya6skib7a2" path="res://demo/fonts/Fake Identity.ttf" id="1_oeex7"]
+[ext_resource type="Script" path="res://addons/scene_manager/scene_resource.gd" id="3_x6vrg"]
+
+[sub_resource type="Resource" id="Resource_xax4p"]
+script = ExtResource("3_x6vrg")
+string_value = ""
+scene_value = 0
+
+[sub_resource type="Resource" id="Resource_jc1pv"]
+script = ExtResource("3_x6vrg")
+string_value = "sc"
+scene_value = 0
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -41,7 +52,7 @@ text = "LOADING
 
 SCREEN"
 script = ExtResource("1")
-scene = 3
+scene = SubResource("Resource_xax4p")
 fade_in_speed = 2.0
 color = Color(0.745098, 0.411765, 0.388235, 1)
 timeout = 0.2
@@ -58,7 +69,7 @@ theme_override_fonts/font = ExtResource("1_oeex7")
 theme_override_font_sizes/font_size = 32
 text = "SCENE 1"
 script = ExtResource("1")
-scene = 3
+scene = SubResource("Resource_jc1pv")
 fade_in_speed = 2.0
 color = Color(0.752941, 0.584314, 0.290196, 1)
 timeout = 0.2

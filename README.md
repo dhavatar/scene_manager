@@ -12,6 +12,8 @@
 - Update icon for this addon
 - Update the README with the changes
 
+Auto-complete node incorporated and modified from https://github.com/Lenrow/line-edit-complete-godot by Lenrow.
+
 <p align="center">
 <img src="icon.png"/>
 </p>

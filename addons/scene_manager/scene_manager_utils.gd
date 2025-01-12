@@ -1,5 +1,5 @@
-extends Node
 class_name SceneManagerUtils
+extends Node
 ## Helper class for the scene manager
 
 

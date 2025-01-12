@@ -1,6 +1,6 @@
 extends Button
 
-@export var scene: Scenes.SceneName = Scenes.SceneName.NONE
+@export var scene: SceneResource
 @export var fade_out_speed: float = 1.0
 @export var fade_in_speed: float = 1.0
 @export var color: Color = Color(0, 0, 0)
@@ -14,7 +14,7 @@ extends Button
 
 
 func _on_button_button_up():
-	SceneManager.change_scene(scene, fade_out_options, fade_in_options, general_options)
+	SceneManager.change_scene(scene.scene_value, fade_out_options, fade_in_options, general_options)
 
 
 func _on_reset_button_up():
@@ -22,12 +22,12 @@ func _on_reset_button_up():
 
 
 func _on_loading_scene_button_up():
-	SceneManager.set_recorded_scene(scene)
+	SceneManager.set_recorded_scene(scene.scene_value)
 	SceneManager.change_scene(Scenes.SceneName.LOADING, fade_out_options, fade_in_options, general_options)
 
 
 func _on_loading_scene_initialization_button_up():
-	SceneManager.set_recorded_scene(scene)
+	SceneManager.set_recorded_scene(scene.scene_value)
 	SceneManager.change_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, fade_out_options, fade_in_options, general_options)
 
 

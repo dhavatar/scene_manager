@@ -2,6 +2,7 @@
 extends EditorPlugin
 
 var _menu: Node
+var _plugin: Object
 
 const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
 const DEFAULT_PATH_TO_SCENES := "res://addons/scene_manager/scenes.gd"
@@ -32,10 +33,18 @@ func _enter_tree():
 		ProjectSettings.set_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH_TO_SCENES)
 	
 	set_properties_for_setting()
+
+	add_custom_type("Auto Complete Assistant", 
+			"Node",
+			preload("res://addons/scene_manager/auto_complete_menu_node/scripts/auto_complete_assistant.gd"),
+			preload("res://addons/scene_manager/icons/line-edit-complete-icon.png"))
+
 	_menu = preload("res://addons/scene_manager/editor/menu.tscn").instantiate()
 	_menu.name = "Scene Manager"
-	
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UL, _menu)
+
+	_plugin = preload("res://addons/scene_manager/property_editor/scene_inspector_plugin.gd").new()
+	add_inspector_plugin(_plugin)
 
 
 # Plugin uninstallation
@@ -49,8 +58,12 @@ func _exit_tree():
 	# ProjectSettings.clear(SETTINGS_PROPERTY_NAME)
 	#
 	# We just don't remove the settings for now
+	remove_custom_type("Auto Complete Assistant")
 	remove_control_from_docks(_menu)
 	_menu.free()
+
+	remove_inspector_plugin(_plugin)
+	_plugin.free()
 
 
 func _enable_plugin():

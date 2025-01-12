@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bll0mw3ddccs1"]
+
+[ext_resource type="Script" path="res://addons/scene_manager/property_editor/scene_line_edit.gd" id="1_a6w4g"]
+[ext_resource type="Script" path="res://addons/scene_manager/auto_complete_menu_node/scripts/auto_complete_assistant.gd" id="2_j4s1p"]
+
+[node name="SceneLineEdit" type="LineEdit" node_paths=PackedStringArray("autocomplete")]
+offset_right = 67.0625
+offset_bottom = 31.0
+script = ExtResource("1_a6w4g")
+autocomplete = NodePath("Autocomplete")
+
+[node name="Autocomplete" type="Node" parent="." node_paths=PackedStringArray("line_edits")]
+script = ExtResource("2_j4s1p")
+line_edits = [NodePath("..")]
+terms = Array[String](["a", "b", "c"])
+is_editor_inspector = true
+case_sensitive_match = false
