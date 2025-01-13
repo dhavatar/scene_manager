@@ -87,6 +87,7 @@ func remove_terms(terms: Array) -> void:
 	all_nodes = all_nodes.filter(func(x): return not x in remove_nodes)
 	all_active_terms = all_active_terms.filter(func(x): return not x in terms)
 	for node in remove_nodes:
+		node.get_node("Button").disconnect("option_chosen")
 		node.queue_free()
 	
 	refresh_nodes(current_text)
@@ -215,12 +216,14 @@ func on_option_chosen(text: String) -> void:
 		whitespace_i += 1
 	
 	edit.text = " ".join(PackedStringArray(text_parts))
-	print("Edit text is now {0}".format([edit.text]))
 	edit.grab_focus()
-	print("Edit text after focus {0}".format([edit.text]))
 	edit.caret_column = new_column_pos
+
+	# Special case: If the edit is a SceneLineEdit, then we also need to alert it to the change
+	if edit is SceneLineEdit:
+		edit.emit_signal("text_changed", edit.text)
+
 	hide_menu(true)
-	print("Edit text after hide menu {0}".format([edit.text]))
 
 
 func get_option_text(option: Control) -> String:

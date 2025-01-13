@@ -99,20 +99,21 @@ func get_location_boundaries(edit: LineEdit) -> Array:
 		menu_location_node = edit.get_parent_control()
 		while menu_location_node != null and menu_location_node.name != "Inspector":
 			menu_location_node = menu_location_node.get_parent_control()
-
-	# If the menu location is still null and we're in the inspector, quietly quit as
-	# it may not be ready yet and we don't want to show errors in the output.
-	if is_editor_inspector and not menu_location_node:
-		return []
 	
 	if not menu_location_node or not edit:
-		assert(false, "ERROR: NODE CONFIGURATION ERROR; LOCATION_NODE OR EDIT_NODE ARE NULL!")
+		# If the menu location is still null and we're in the inspector, quietly quit as
+		# it may not be ready yet and we don't want to show errors in the output.
+		if not is_editor_inspector:
+			assert(false, "ERROR: NODE CONFIGURATION ERROR; LOCATION_NODE OR EDIT_NODE ARE NULL!")
 		return []
 	
 	var location_rect = menu_location_node.get_global_rect()
 	var edit_rect = edit.get_global_rect()
 	if not location_rect.intersects(edit_rect):
-		assert(false, "ERROR: NODE CONFIGURATION ERROR; EDIT NOT WITHIN LOCATION_NODE")
+		# Same thing for the rectangle check as the inspector may be setting things up
+		# or have stale values.
+		if not is_editor_inspector:
+			assert(false, "ERROR: NODE CONFIGURATION ERROR; EDIT NOT WITHIN LOCATION_NODE")
 		return []
 	
 	var direction_rects = AutoCompleteHelpers.subtract_rects(location_rect, edit_rect)
@@ -131,7 +132,7 @@ func get_location_boundaries(edit: LineEdit) -> Array:
 	else:
 		max_size.y = (location_rect.size - (edit_rect.position - location_rect.position)).y
 	var vertical_direction = AutoCompleteEnums.Direction.NORTH if values[0].size.y > values[2].size.y else AutoCompleteEnums.Direction.SOUTH
-
+	
 	return [AutoCompleteEnums.Direction[direction_rects.keys()[max_index]], vertical_direction, max_size]
 
 

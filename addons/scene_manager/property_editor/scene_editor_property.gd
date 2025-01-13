@@ -29,6 +29,7 @@ func _on_text_changed(new_text: String):
 	if current_value == null:
 		current_value = SceneResource.new()
 	
+	# TODO: Convert to enum
 	current_value.string_value = new_text
 	emit_changed(get_edited_property(), current_value)
 
@@ -45,6 +46,7 @@ func _update_property():
 	if current_value == null:
 		current_value = SceneResource.new()
 
+	# TODO: Convert to num
 	current_value = new_value
 	_refresh_control_text()
 
