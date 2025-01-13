@@ -15,17 +15,17 @@ func _ready() -> void:
 		_root = _root.get_parent()
 
 
-# Sets address of current ignore item
+# Sets address of current item
 func set_address(addr: String) -> void:
 	get_node("address").text = addr
 	name = addr
 
 
-# Returns address of current ignore item
+# Returns address of current item
 func get_address() -> String:
 	return get_node("address").text
 
 
 # Remove Button
 func _on_remove_button_up() -> void:
-	_root.emit_signal("ignore_child_deleted", self)
+	_root.emit_signal("include_child_deleted", self)

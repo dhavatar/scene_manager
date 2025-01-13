@@ -22,7 +22,5 @@ func loading_finished() -> void:
 
 
 func _on_next_button_up():
-	var fade_out_options := SceneManager.create_options(1.0)
-	var fade_in_options := SceneManager.create_options(1.0)
 	var general_options := SceneManager.create_general_options(Color(0, 0, 0), 0, false, true)
-	SceneManager.change_scene_to_loaded_scene(fade_out_options, fade_in_options, general_options)
+	SceneManager.change_scene_to_loaded_scene(1.0, 1.0, general_options)

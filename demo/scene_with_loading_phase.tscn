@@ -1,8 +1,9 @@
 [gd_scene load_steps=4 format=3 uid="uid://bdcja8idnw3bu"]
 
 [ext_resource type="Script" path="res://demo/loading_phase_mechanic.gd" id="1_eqil7"]
-[ext_resource type="FontFile" uid="uid://c5nya6skib7a2" path="res://demo/fonts/Fake Identity.ttf" id="1_ewqw2"]
+[ext_resource type="FontFile" path="res://addons/demo/fonts/Fake Identity.ttf" id="1_ewqw2"]
 [ext_resource type="Script" path="res://demo/button.gd" id="2_chu1e"]
+
 
 [node name="SceneWithLoadingPhase" type="Control"]
 layout_mode = 3
