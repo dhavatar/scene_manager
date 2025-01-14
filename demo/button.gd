@@ -8,13 +8,11 @@ extends Button
 @export var clickable: bool = false
 @export var add_to_back: bool = true
 
-@onready var fade_out_options := SceneManager.create_options(fade_out_speed)
-@onready var fade_in_options := SceneManager.create_options(fade_in_speed)
 @onready var general_options := SceneManager.create_general_options(color, timeout, clickable, add_to_back)
 
 
 func _on_button_button_up():
-	SceneManager.change_scene(scene.scene_value, fade_out_options, fade_in_options, general_options)
+	SceneManager.change_scene(scene.scene_value, fade_out_speed, fade_in_speed, general_options)
 
 
 func _on_reset_button_up():
@@ -23,18 +21,18 @@ func _on_reset_button_up():
 
 func _on_loading_scene_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.change_scene(Scenes.SceneName.LOADING, fade_out_options, fade_in_options, general_options)
+	SceneManager.change_scene(Scenes.SceneName.LOADING, fade_out_speed, fade_in_speed, general_options)
 
 
 func _on_loading_scene_initialization_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.change_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, fade_out_options, fade_in_options, general_options)
+	SceneManager.change_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, fade_out_speed, fade_in_speed, general_options)
 
 
 func _on_pause_and_resume_button_up():
-	await SceneManager.pause(fade_out_options, general_options)
+	await SceneManager.pause(fade_out_speed, general_options)
 	await get_tree().create_timer(3).timeout
-	await SceneManager.resume(fade_in_options, general_options)
+	await SceneManager.resume(fade_in_speed, general_options)
 
 
 func _on_back_pressed() -> void:

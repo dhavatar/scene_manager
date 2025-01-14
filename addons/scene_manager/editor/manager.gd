@@ -19,8 +19,8 @@ extends Node\n\n"
 const SCENE_DATA_ENUM: String = "# [Scene Enum]"
 const SCENE_DATA_DICTIONARY: String = "# [Scene Dictionary]"
 
-# scene item, ignore item
-const SCENE_IGNORE_ITEM = preload("res://addons/scene_manager/editor/ignore_item.tscn")
+# scene item, include item
+const SCENE_INCLUDE_ITEM = preload("res://addons/scene_manager/editor/deletable_item.tscn")
 const SCENE_LIST_ITEM = preload("res://addons/scene_manager/editor/scene_list.tscn")
 
 # icons
@@ -29,7 +29,7 @@ const ICON_HIDE_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/Gui
 const ICON_FOLDER_BUTTON_CHECKED = preload("res://addons/scene_manager/icons/FolderActive.svg")
 const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/Folder.svg")
 
-@onready var _ignore_list: Node = self.find_child("ignore_list")
+@onready var _include_list: Node = self.find_child("include_list")
 # add save, refresh
 @onready var _save_button: Button = self.find_child("save")
 @onready var _refresh_button: Button = self.find_child("refresh")
@@ -39,7 +39,7 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 @onready var _add_subsection_button: Button = self.find_child("add_subsection")
 @onready var _add_section_button: Button = self.find_child("add_section")
 @onready var _section_name_line_edit: LineEdit = self.find_child("section_name")
-# add ignore
+# add include
 @onready var _address_line_edit: LineEdit = self.find_child("address")
 @onready var _file_dialog: FileDialog = self.find_child("file_dialog")
 @onready var _hide_button: Button = self.find_child("hide")
@@ -47,8 +47,8 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 @onready var _add_button: Button = self.find_child("add")
 # containers
 @onready var _tab_container: TabContainer = self.find_child("tab_container")
-@onready var _ignores_container: Node = self.find_child("ignores")
-@onready var _ignores_panel_container: Node = self.find_child("ignores_panel")
+@onready var _include_container: Node = self.find_child("includes")
+@onready var _include_panel_container: Node = self.find_child("include_panel")
 # generals
 @onready var _accept_dialog: AcceptDialog = self.find_child("accept_dialog")
 
@@ -61,7 +61,7 @@ var reserved_keys: Array = ["none"]
 var _timer: Timer = null;
 
 # UI signal callbacks
-signal ignore_child_deleted(node: Node)
+signal include_child_deleted(node: Node)
 signal item_renamed(node: Node)
 signal item_visibility_changed(node: Node, visibility: bool)
 signal item_added_to_list(node: Node, list_name: String)
@@ -75,7 +75,7 @@ signal added_to_sub_section(node: Node, sub_section: Node)
 func _ready() -> void:
 	_on_refresh_button_up()
 	EditorInterface.get_resource_filesystem().filesystem_changed.connect(_filesystem_changed)
-	self.ignore_child_deleted.connect(_on_ignore_child_deleted)
+	self.include_child_deleted.connect(_on_include_child_deleted)
 	self.item_renamed.connect(_on_item_renamed)
 	self.item_visibility_changed.connect(_on_item_visibility_changed)
 	self.item_added_to_list.connect(_on_added_to_list)
@@ -190,48 +190,42 @@ func show_message(title: String, description: String) -> void:
 	_accept_dialog.popup_centered(Vector2(400, 100))
 
 
-# Returns all scenes in current and sub folders of `root_path` address
-func _get_scenes(root_path: String, ignores: Array) -> Dictionary:
+# Returns all scenes from the included directories.
+func _get_scenes(includes: Array) -> Dictionary:
 	var files: Dictionary = {}
 	var folders: Array = []
-	var dir = DirAccess.open(root_path)
-	var original_root_path = root_path
-	if root_path[len(root_path) - 1] != "/":
-		root_path = root_path + "/"
-	if !(original_root_path in ignores) && dir:
+	
+	for include_dir in includes:
+		var dir := DirAccess.open(include_dir)
+
+		# Make sure there's a trailing slash at the end
+		if include_dir[len(include_dir) - 1] != "/":
+			include_dir = include_dir + "/"
+
 		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 
-		if dir.file_exists(root_path + ".gdignore"):
-			return files
+		if dir.file_exists(include_dir + ".gdignore"):
+			continue
+		
 		while true:
 			var file_folder = dir.get_next()
-			var exact_address = root_path + file_folder
+			var exact_address = include_dir + file_folder
 			if file_folder == "":
 				break
 			elif dir.current_is_dir():
-				folders.append(file_folder)
-			elif file_folder.get_extension() == "tscn" && !(exact_address in ignores):
-				files[file_folder.replace("."+file_folder.get_extension(), "")] = exact_address
+				continue
+			elif file_folder.get_extension() == "tscn":
+				files[file_folder.replace("." + file_folder.get_extension(), "")] = exact_address
 
 		dir.list_dir_end()
 
-		for folder in folders:
-			var new_files: Dictionary = _get_scenes(root_path + folder, ignores)
-			if len(new_files) != 0:
-				_merge_dict(files, new_files)
-	else:
-		# If `root_path` was really a file and not a folder, we know the reason and
-		# propably this is comming from `_on_ignore_child_deleted`, so just add it to list
-		if !(original_root_path in ignores):
-			if (!FileAccess.file_exists(original_root_path)):
-				print ("Couldn't open ", original_root_path)
-			else:
-				var splits = original_root_path.split("/", false)
-				var file = splits[len(splits) - 1]
-				if file.get_extension() == "tscn":
-					files[file.replace("."+file.get_extension(), "")] = original_root_path
-
 	return files
+
+
+## Removes scene from UI and data based on the root address
+func _remove_scene(scene_address: String) -> void:
+	# TODO: Implement a non-nuclear way of refreshing things.
+	call_deferred("_on_refresh_button_up")
 
 
 # Clears scenes inside a UI list
@@ -311,16 +305,27 @@ func add_scene_to_list(list_name: String, scene_name: String, scene_address: Str
 	await all_list.add_item(scene_name, scene_address, setting)
 
 
-# Adds an address to ignore list
-func _add_ignore_item(address: String) -> void:
-	var item = SCENE_IGNORE_ITEM.instantiate()
+# Adds an address to the include list
+func _add_include_item(address: String) -> void:
+	var item := SCENE_INCLUDE_ITEM.instantiate()
 	item.set_address(address)
-	_ignore_list.add_child(item)
+	_include_list.add_child(item)
+
+
+func _remove_include_item(address: String) -> void:
+	var remove_list: Array = []
+	for node in _get_nodes_in_include_ui():
+		if node.get_address() == address or address.begins_with(node.get_address()):
+			remove_list.append(node)
+	
+	for node in remove_list:
+		_include_list.remove_child(node)
+		node.free()
 
 
 # Appends all scenes into their assigned UI lists
 #
-# This function gets called just from `_on_ignore_child_deleted`
+# This function gets called just from `_on_include_child_deleted`
 func _append_scenes(scenes: Dictionary) -> void:
 	_get_one_list_node_by_name("All").append_scenes(scenes)
 	for list in _get_lists_nodes():
@@ -331,17 +336,17 @@ func _append_scenes(scenes: Dictionary) -> void:
 				await list.add_item(key, scenes[key], ItemSetting.default())
 
 
-# Clears all tabs, UI lists and ignore list
+# Clears all tabs, UI lists and include list
 func _clear_all() -> void:
 	_delete_all_tabs()
 	_clear_all_lists()
-	_clear_ignore_list()
+	_clear_include_list()
 
 
 # Reloads all scenes in UI and in this script
 func _reload_scenes() -> void:
 	var data: Dictionary = _load_scenes()
-	var scenes: Dictionary = _get_scenes(ROOT_ADDRESS, _load_ignores())
+	var scenes: Dictionary = _get_scenes(_load_includes())
 	var scenes_values: Array = scenes.values()
 	# Reloads all scenes in `Scenes` script in UI and in this script
 	for key in data:
@@ -352,8 +357,8 @@ func _reload_scenes() -> void:
 		if key == "_auto_save":
 			_change_auto_save_state(scene)
 			continue
-		if key == "_ignores_visible":
-			_hide_unhide_ignores_list(scene)
+		if key == "_includes_visible":
+			_hide_unhide_includes_list(scene)
 			continue
 		var keys = scene.keys()
 		assert (("value" in keys) && ("sections" in keys), "Scene Manager Error: this format is not supported. Every scene item has to have 'value' and 'sections' field inside them.'")
@@ -388,10 +393,10 @@ func _reload_scenes() -> void:
 			_add_scene_to_list("All", key, scenes[key], setting)
 
 
-# Reloads ignores list in UI and in this script
-func _reload_ignores() -> void:
-	var ignores: Array = _load_ignores()
-	_set_ignores(ignores)
+# Reloads include list in UI and in this script
+func _reload_includes() -> void:
+	var includes: Array = _load_includes()
+	_set_includes(includes)
 
 
 # Reloads tabs in UI
@@ -413,7 +418,7 @@ func _on_refresh_button_up() -> void:
 	_clear_all()
 	_reload_tabs()
 	_reload_scenes()
-	_reload_ignores()
+	_reload_includes()
 
 # `_sections` variable Manager
 
@@ -531,11 +536,11 @@ func _load_scenes() -> Dictionary:
 	return _load_all()[SceneManagerConstants.SCENE_DATA_KEY]
 
 
-# Loads and returns just array value of `_ignore_list` key from `scenes` variable of `scenes.gd` file
-func _load_ignores() -> Array:
+# Loads and returns just array value of `_include_list` key from `scenes` variable of `scenes.gd` file
+func _load_includes() -> Array:
 	var dic: Dictionary = _load_all()
-	if dic.has("_ignore_list"):
-		return dic["_ignore_list"]
+	if dic.has("_include_list"):
+		return dic["_include_list"]
 	return []
 
 
@@ -556,6 +561,10 @@ func _file_exists(address: String) -> bool:
 func _get_scenes_from_ui() -> Dictionary:
 	var list: Node = _get_one_list_node_by_name("All")
 	var data: Dictionary = {}
+
+	if list == null:
+		return data
+
 	for node in list.get_list_nodes():
 		var value = node.get_value()
 		var sections = get_sections(value)
@@ -592,11 +601,11 @@ func _get_scene_nodes_from_view() -> Array:
 # Gathers all data from UI and returns it
 func _create_save_dic() -> Dictionary:
 	var data: Dictionary = {}
-	data["_ignore_list"] = _get_ignores_in_ignore_ui()
+	data["_include_list"] = _get_includes_in_include_ui()
 	data["_sections"] = get_all_lists_names_except(["All"])
 	data["_auto_refresh"] = _auto_refresh_button.get_meta("enabled", false)
 	data["_auto_save"] = _auto_save_button.get_meta("enabled", false)
-	data["_ignores_visible"] = _ignores_container.visible
+	data["_includes_visible"] = _include_container.visible
 	data[SceneManagerConstants.SCENE_DATA_KEY] = _get_scenes_from_ui()
 	return data
 
@@ -607,63 +616,56 @@ func _on_save_button_up():
 	_save_all(_create_save_dic())
 
 
-# Returns array of ignore nodes from UI view
-func _get_nodes_in_ignore_ui() -> Array:
+# Returns array of include nodes from UI view
+func _get_nodes_in_include_ui() -> Array:
 	var arr: Array = []
-	for i in range(_ignore_list.get_child_count()):
-		arr.append(_ignore_list.get_child(i))
+	for i in range(_include_list.get_child_count()):
+		arr.append(_include_list.get_child(i))
 	return arr
 
 
-# Returns array of addresses to ignore
-func _get_ignores_in_ignore_ui() -> Array:
+# Returns array of addresses to include
+func _get_includes_in_include_ui() -> Array:
 	var arr: Array = []
-	for node in _get_nodes_in_ignore_ui():
+	for node in _get_nodes_in_include_ui():
 		arr.append(node.get_address())
 	return arr
 
 
-# Sets current passed list of ignores into UI instead of others
-func _set_ignores(list :Array) -> void:
-	_clear_ignore_list()
+# Sets current passed list of includes into UI instead of others
+func _set_includes(list :Array) -> void:
+	_clear_include_list()
 	for text in list:
-		_add_ignore_item(text)
+		_add_include_item(text)
 
 
-# Clears ignores from UI
-func _clear_ignore_list() -> void:
-	for node in _get_nodes_in_ignore_ui():
+# Clears includes from UI
+func _clear_include_list() -> void:
+	for node in _get_nodes_in_include_ui():
 		node.free()
 
 
-# Returns true if passed address exists in ignore list
-func _ignore_exists_in_list(address: String) -> bool:
-	for node in _get_nodes_in_ignore_ui():
+# Returns true if passed address exists in include list
+func _include_exists_in_list(address: String) -> bool:
+	for node in _get_nodes_in_include_ui():
 		if node.get_address() == address or address.begins_with(node.get_address()):
 			return true
 	return false
 
 
-# Removes scenes begin with a specific text in all lists
-func _remove_scenes_begin_with(text: String):
-	for node in _get_lists_nodes():
-		node.remove_items_begins_with(text)
-
-
-# Ignore list Add button up
+# Include list Add button up
 func _on_add_button_up():
-	if _ignore_exists_in_list(_address_line_edit.text):
+	if _include_exists_in_list(_address_line_edit.text):
 		_address_line_edit.text = ""
 		return
-	_add_ignore_item(_address_line_edit.text)
-	_remove_scenes_begin_with(_address_line_edit.text)
+	_add_include_item(_address_line_edit.text)
 	_address_line_edit.text = ""
 	_add_button.disabled = true
 	if _auto_save_button.get_meta("enabled", false):
 		_save_all(_create_save_dic())
+	_reload_scenes()
 
-
-# Pops up file dialog to select a ignore folder
+# Pops up file dialog to select a folder to include
 func _on_file_dialog_button_button_up():
 	_file_dialog.popup_centered(Vector2(600, 600))
 
@@ -674,21 +676,19 @@ func _on_file_dialog_dir_file_selected(path):
 	_on_address_text_changed(path)
 
 
-# When an ignore item remove button clicks
-func _on_ignore_child_deleted(node: Node) -> void:
+# When an include item remove button clicks
+func _on_include_child_deleted(node: Node) -> void:
 	var address: String = node.get_address()
 	node.queue_free()
-	var ignores: Array = []
-	for ignore in _load_ignores():
-		if ignore.begins_with(address) && ignore != address:
-			ignores.append(ignore)
-	_append_scenes(_get_scenes(address, ignores))
+
+	_remove_scene(address)
 	await node.tree_exited
+
 	if _auto_save_button.get_meta("enabled", false):
 		_save_all(_create_save_dic())
 
 
-# When ignore address bar text changes
+# When include address bar text changes
 func _on_address_text_changed(new_text: String) -> void:
 	if new_text != "":
 		if DirAccess.dir_exists_absolute(new_text) || FileAccess.file_exists(new_text) && new_text.begins_with("res://"):
@@ -730,24 +730,24 @@ func _on_section_name_text_changed(new_text):
 		_add_subsection_button.disabled = true
 
 
-func _hide_unhide_ignores_list(value: bool) -> void:
+func _hide_unhide_includes_list(value: bool) -> void:
 	if value:
 		_hide_button.icon = ICON_HIDE_BUTTON_CHECKED
 		_hide_unhide_button.icon = ICON_HIDE_BUTTON_CHECKED
-		_ignores_container.visible = true
-		_ignores_panel_container.visible = true
+		_include_container.visible = true
+		_include_panel_container.visible = true
 		_hide_unhide_button.visible = false
 	else:
 		_hide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
 		_hide_unhide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
-		_ignores_container.visible = false
-		_ignores_panel_container.visible = false
+		_include_container.visible = false
+		_include_panel_container.visible = false
 		_hide_unhide_button.visible = true
 
 
 # Hide Button
 func _on_hide_button_up():
-	_hide_unhide_ignores_list(!_ignores_container.visible)
+	_hide_unhide_includes_list(!_include_container.visible)
 	_save_all(_create_save_dic())
 
 

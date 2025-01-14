@@ -27,11 +27,6 @@ signal fade_in_finished
 signal fade_out_finished
 
 
-class Options:
-	# based checked seconds
-	var fade_speed: float = 1
-
-
 class GeneralOptions:
 	var color: Color = Color(0, 0, 0)
 	var timeout: float = 0
@@ -39,9 +34,9 @@ class GeneralOptions:
 	var add_to_back: bool = true
 
 
-func _current_scene_is_ignored(scene_file_path: String) -> bool:
-	for ignore_path in Scenes.scenes._ignore_list:
-		if scene_file_path.begins_with(ignore_path):
+func _current_scene_is_included(scene_file_path: String) -> bool:
+	for include_path in Scenes.scenes._include_list:
+		if scene_file_path.begins_with(include_path):
 			return true
 	return false
 
@@ -51,7 +46,7 @@ func _set_current_scene() -> void:
 	var scene_file_path: String = get_tree().current_scene.scene_file_path
 	_current_scene = _get_scene_key_by_value(scene_file_path)
 
-	assert (!(_current_scene == Scenes.SceneName.NONE and !_current_scene_is_ignored(scene_file_path)), \
+	assert (!(_current_scene == Scenes.SceneName.NONE and !_current_scene_is_included(scene_file_path)), \
 		"Scene Manager Error: loaded scene is not defined in scene manager tool, to fix this, on Scene Manager UI panel, just once click on refresh and then save buttons respectively.")
 	if _current_scene == Scenes.SceneName.NONE:
 		push_warning("loaded scene is ignored by scene manager, it means that you can not go back to this scene by 'back' key word.")
@@ -217,13 +212,6 @@ func reset_scene_manager() -> void:
 	_back_buffer.clear()
 
 
-## Creates options for fade_out or fade_in transition.
-func create_options(fade_speed: float = 1.0) -> Options:
-	var options: Options = Options.new()
-	options.fade_speed = fade_speed
-	return options
-
-
 ## Creates options for common properties in transition.[br]
 ##
 ## add_to_back means that you can go back to the scene if you
@@ -270,12 +258,12 @@ func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
 
 
 ## Changes current scene to the specified scene.
-func change_scene(scene: Scenes.SceneName, fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
+func change_scene(scene: Scenes.SceneName, fade_out_time: float, fade_in_time: float, general_options: GeneralOptions) -> void:
 	_first_time = false
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
 
-	if _fade_out(fade_out_options.fade_speed):
+	if _fade_out(fade_out_time):
 		await _animation_player.animation_finished
 		fade_out_finished.emit()
 
@@ -286,7 +274,7 @@ func change_scene(scene: Scenes.SceneName, fade_out_options: Options, fade_in_op
 	if _timeout(general_options.timeout):
 		await get_tree().create_timer(general_options.timeout).timeout
 	
-	if _fade_in(fade_in_options.fade_speed):
+	if _fade_in(fade_in_time):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
 
@@ -341,11 +329,11 @@ func add_loaded_scene_to_scene_tree() -> void:
 ## When you added the loaded scene to the scene tree by `add_loaded_scene_to_scene_tree`
 ## function, you call this function after you are sure that the added scene to scene tree
 ## is completely ready and functional to change the active scene
-func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
+func change_scene_to_existing_scene_in_scene_tree(fade_out_time: float, fade_in_time: float, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
 	
-	if _fade_out(fade_out_options.fade_speed):
+	if _fade_out(fade_out_time):
 		await _animation_player.animation_finished
 		fade_out_finished.emit()
 
@@ -368,7 +356,7 @@ func change_scene_to_existing_scene_in_scene_tree(fade_out_options: Options, fad
 	if _timeout(general_options.timeout):
 		await get_tree().create_timer(general_options.timeout).timeout
 	
-	if _fade_in(fade_in_options.fade_speed):
+	if _fade_in(fade_in_time):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
 
@@ -408,11 +396,11 @@ func get_loaded_scene() -> PackedScene:
 
 
 ## Changes scene to loaded scene
-func change_scene_to_loaded_scene(fade_out_options: Options, fade_in_options: Options, general_options: GeneralOptions) -> void:
+func change_scene_to_loaded_scene(fade_out_time: float, fade_in_time: float, general_options: GeneralOptions) -> void:
 	if _load_scene != "":
 		var scene = ResourceLoader.load_threaded_get(_load_scene) as PackedScene
 		if scene:
-			change_scene(_load_scene_enum, fade_out_options, fade_in_options, general_options)
+			change_scene(_load_scene_enum, fade_out_time, fade_in_time, general_options)
 
 
 ## Returns previous scene (scene before current scene)
@@ -449,20 +437,20 @@ func get_recorded_scene() -> Scenes.SceneName:
 
 
 ## Pause (fadeout). You can resume afterwards.
-func pause(fade_out_options: Options, general_options: GeneralOptions) -> void:
+func pause(fade_out_time: float, general_options: GeneralOptions) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
 	
-	if _fade_out(fade_out_options.fade_speed):
+	if _fade_out(fade_out_time):
 		await _animation_player.animation_finished
 		fade_out_finished.emit()
 
 
 ## Resume (fadein) after pause
-func resume(fade_in_options: Options, general_options: GeneralOptions) -> void:
+func resume(fade_in_time: float, general_options: GeneralOptions) -> void:
 	_set_clickable(general_options.clickable)
 	
-	if _fade_in(fade_in_options.fade_speed):
+	if _fade_in(fade_in_time):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
 

@@ -8,7 +8,6 @@
 [ext_resource type="Texture2D" uid="uid://d1a02j2vpxq5f" path="res://addons/scene_manager/icons/FolderActive.svg" id="7_3r2fd"]
 [ext_resource type="Texture2D" uid="uid://bpjecrtgui38m" path="res://addons/scene_manager/icons/GuiChecked.svg" id="7_d04a5"]
 
-
 [node name="root_container" type="MarginContainer"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,6 +27,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+current_tab = 0
 drag_to_rearrange_enabled = true
 
 [node name="add_category_container" type="MarginContainer" parent="main_container"]
@@ -60,83 +60,84 @@ text = "+ List"
 [node name="separator" type="HSeparator" parent="main_container"]
 layout_mode = 2
 
-[node name="ignores" type="VBoxContainer" parent="main_container"]
+[node name="includes" type="VBoxContainer" parent="main_container"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.3
 
-[node name="container" type="VBoxContainer" parent="main_container/ignores"]
+[node name="container" type="VBoxContainer" parent="main_container/includes"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="_title" type="HBoxContainer" parent="main_container/ignores/container"]
+[node name="_title" type="HBoxContainer" parent="main_container/includes/container"]
 layout_mode = 2
 
-[node name="delete_list" type="Button" parent="main_container/ignores/container/_title"]
+[node name="delete_list" type="Button" parent="main_container/includes/container/_title"]
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 disabled = true
 
-[node name="scenes" parent="main_container/ignores/container/_title" instance=ExtResource("2")]
+[node name="scenes" parent="main_container/includes/container/_title" instance=ExtResource("2")]
 layout_mode = 2
-text = "Ignores:"
+text = "Includes:"
+vertical_alignment = 1
 
-[node name="ignores" type="ScrollContainer" parent="main_container/ignores/container"]
+[node name="includes" type="ScrollContainer" parent="main_container/includes/container"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ignore_list" type="VBoxContainer" parent="main_container/ignores/container/ignores"]
+[node name="include_list" type="VBoxContainer" parent="main_container/includes/container/includes"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ignores_panel" type="VBoxContainer" parent="main_container/ignores"]
+[node name="include_panel" type="VBoxContainer" parent="main_container/includes"]
 layout_mode = 2
 
-[node name="ignore_interactive_section_container" type="MarginContainer" parent="main_container/ignores/ignores_panel"]
+[node name="include_interactive_section_container" type="MarginContainer" parent="main_container/includes/include_panel"]
 layout_mode = 2
 size_flags_vertical = 8
 
-[node name="add_ignore_container" type="HBoxContainer" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container"]
+[node name="add_include_container" type="HBoxContainer" parent="main_container/includes/include_panel/include_interactive_section_container"]
 layout_mode = 2
 
-[node name="dialog_add_ignore_container" type="HBoxContainer" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container"]
+[node name="dialog_add_include_container" type="HBoxContainer" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="file_dialog" type="FileDialog" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container"]
+[node name="file_dialog" type="FileDialog" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container"]
 mode = 2
 title = "Open a File or Directory"
 ok_button_text = "Open"
 file_mode = 3
 
-[node name="file_dialog_button" type="Button" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container"]
+[node name="file_dialog_button" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container"]
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 icon = ExtResource("3")
 
-[node name="address" type="LineEdit" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container"]
+[node name="address" type="LineEdit" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="dialog_add_ignore_container2" type="HBoxContainer" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container"]
+[node name="dialog_add_include_container2" type="HBoxContainer" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="add" type="Button" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container2"]
+[node name="add" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2"]
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
 text = "Add"
 
-[node name="hide" type="Button" parent="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container2"]
+[node name="hide" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2"]
 layout_mode = 2
 focus_mode = 0
 icon = ExtResource("7_d04a5")
 metadata/enabled = true
 
-[node name="separator" type="HSeparator" parent="main_container/ignores/ignores_panel"]
+[node name="separator" type="HSeparator" parent="main_container/includes/include_panel"]
 layout_mode = 2
 
 [node name="interactive_section_container" type="VBoxContainer" parent="main_container"]
@@ -208,12 +209,12 @@ dialog_autowrap = true
 [connection signal="text_changed" from="main_container/add_category_container/add_category_container/section_name" to="." method="_on_section_name_text_changed"]
 [connection signal="button_up" from="main_container/add_category_container/add_category_container/HBoxContainer/add_subsection" to="." method="_on_add_subsection_button_up"]
 [connection signal="button_up" from="main_container/add_category_container/add_category_container/HBoxContainer/add_section" to="." method="_on_add_section_button_up"]
-[connection signal="dir_selected" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container/file_dialog" to="." method="_on_file_dialog_dir_file_selected"]
-[connection signal="file_selected" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container/file_dialog" to="." method="_on_file_dialog_dir_file_selected"]
-[connection signal="button_up" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container/file_dialog_button" to="." method="_on_file_dialog_button_button_up"]
-[connection signal="text_changed" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container/address" to="." method="_on_address_text_changed"]
-[connection signal="button_up" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container2/add" to="." method="_on_add_button_up"]
-[connection signal="button_up" from="main_container/ignores/ignores_panel/ignore_interactive_section_container/add_ignore_container/dialog_add_ignore_container2/hide" to="." method="_on_hide_button_up"]
+[connection signal="dir_selected" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container/file_dialog" to="." method="_on_file_dialog_dir_file_selected"]
+[connection signal="file_selected" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container/file_dialog" to="." method="_on_file_dialog_dir_file_selected"]
+[connection signal="button_up" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container/file_dialog_button" to="." method="_on_file_dialog_button_button_up"]
+[connection signal="text_changed" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container/address" to="." method="_on_address_text_changed"]
+[connection signal="button_up" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2/add" to="." method="_on_add_button_up"]
+[connection signal="button_up" from="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2/hide" to="." method="_on_hide_button_up"]
 [connection signal="button_up" from="main_container/interactive_section_container/margin_refresh_save_container/refresh_save_container/save_refresh_container/refresh" to="." method="_on_refresh_button_up"]
 [connection signal="button_up" from="main_container/interactive_section_container/margin_refresh_save_container/refresh_save_container/save_refresh_container/save_container/save" to="." method="_on_save_button_up"]
 [connection signal="button_up" from="main_container/interactive_section_container/margin_refresh_save_container/refresh_save_container/save_refresh_container/save_container/hide_unhide" to="." method="_on_hide_button_up"]
