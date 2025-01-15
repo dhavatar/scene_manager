@@ -5,7 +5,6 @@ var _menu: Node
 var _plugin: Object
 
 const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
-const DEFAULT_PATH_TO_SCENES := "res://addons/scene_manager/scenes.gd"
 
 
 func set_properties_for_setting():
@@ -17,7 +16,7 @@ func set_properties_for_setting():
 	}
 	ProjectSettings.add_property_info(property_info)
 	
-	ProjectSettings.set_initial_value(SETTINGS_PROPERTY_NAME, DEFAULT_PATH_TO_SCENES)
+	ProjectSettings.set_initial_value(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
 	ProjectSettings.set_as_basic(SETTINGS_PROPERTY_NAME, true)
 	
 	# Restart is required as path to Scenes singleton has changed
@@ -30,7 +29,7 @@ func set_properties_for_setting():
 func _enter_tree():
 	# Adding settings property to Project/Settings & loading
 	if !ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
-		ProjectSettings.set_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH_TO_SCENES)
+		ProjectSettings.set_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
 	
 	set_properties_for_setting()
 
@@ -63,11 +62,10 @@ func _exit_tree():
 	_menu.free()
 
 	remove_inspector_plugin(_plugin)
-	_plugin.free()
 
 
 func _enable_plugin():
-	var path_to_scenes = DEFAULT_PATH_TO_SCENES
+	var path_to_scenes = SceneManagerConstants.DEFAULT_PATH_TO_SCENES
 	if ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
 		path_to_scenes = ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME)
 	

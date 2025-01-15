@@ -7,7 +7,6 @@ extends MarginContainer
 
 # Project Settings property name
 const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
-const DEFAULT_PATH: String = "res://addons/scene_manager/scenes.gd"
 const ROOT_ADDRESS = "res://"
 
 # scene.gd autogen file tags
@@ -489,7 +488,7 @@ func check_duplication():
 
 # Saves all data in `scenes` variable of `scenes.gd` file
 func _save_all(data: Dictionary) -> void:
-	var file := FileAccess.open(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH), FileAccess.WRITE)
+	var file := FileAccess.open(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES), FileAccess.WRITE)
 
 	# Generates the scene.gd file with all the scene data
 	var write_data: String = SCENE_DATA_HEADER
@@ -514,8 +513,8 @@ func _save_all(data: Dictionary) -> void:
 func _load_all() -> Dictionary:
 	var data: Dictionary = {}
 
-	if _file_exists(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH)):
-		var file := FileAccess.open(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, DEFAULT_PATH), FileAccess.READ)
+	if _file_exists(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)):
+		var file := FileAccess.open(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES), FileAccess.READ)
 
 		while not file.eof_reached():
 			var line := file.get_line()
