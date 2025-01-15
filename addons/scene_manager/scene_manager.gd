@@ -127,7 +127,7 @@ func _get_scene_key_by_value(path: String) -> Scenes.SceneName:
 	return Scenes.SceneName.NONE
 
 
-# Returns the 
+# Returns the raw dictionary values for the scene
 func _get_scene_value(scene: Scenes.SceneName) -> String:
 	# The enums are normalized to have all caps, but the keys in the scenes may not have that,
 	# do a string comparison with everything normalized.
