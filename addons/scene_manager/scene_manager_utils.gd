@@ -1,3 +1,4 @@
+@tool
 class_name SceneManagerUtils
 extends Node
 ## Helper class for the scene manager
@@ -17,7 +18,7 @@ static func get_string_from_enum(scene: Scenes.SceneName) -> String:
 ##
 ## Returns Scenes.SceneName.NONE if the string doesn't match anything.
 static func get_enum_from_string(key: String) -> Scenes.SceneName:
-	var normalized := normalize_string(key)
+	var normalized := normalize_enum_string(key)
 	if normalized in Scenes.SceneName.keys():
 		return Scenes.SceneName.get(normalized) as Scenes.SceneName
 	
@@ -25,6 +26,18 @@ static func get_enum_from_string(key: String) -> Scenes.SceneName:
 
 
 ## Returns a string that is all caps with spaces replaced with underscores.
-static func normalize_string(data: String) -> String:
-	data = data.replace(" ", "_")
-	return data.to_upper()
+static func normalize_enum_string(text: String) -> String:
+	text = text.replace(" ", "_")
+	return text.to_upper()
+
+
+## Returns a string that has no symbols, is lower cases, and spaces are underscores.
+static func normalize_key_string(text: String) -> String:
+	var regex := RegEx.new()
+	regex.compile("[^a-zA-Z0-9_ -]")
+	var result := regex.search(text)
+	if result:
+		text = text.replace(result.get_string(), "")
+	
+	text = text.replace(" ", "_")
+	return text

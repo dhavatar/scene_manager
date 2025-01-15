@@ -202,22 +202,9 @@ func hide_menu(override: bool = false) -> void:
 ## Applies the [param text] chosen in the menu to the edits text[br]
 ## Is called by the option_chosen signal in the option_button
 func on_option_chosen(text: String) -> void:
-	var text_parts = edit.text.split(" ")
-	var t_length = 0
-	var whitespace_i = 0
-	var new_column_pos = edit.text.length()
-
-	for i in text_parts.size():
-		t_length += text_parts[i].length()
-		if current_text == text_parts[i] and t_length + whitespace_i >= edit.caret_column:
-			text_parts[i] = text
-			new_column_pos = " ".join(PackedStringArray(text_parts.slice(0, i))).length() + text.length() + (0 if i == 0 else 1)
-			break
-		whitespace_i += 1
-	
-	edit.text = " ".join(PackedStringArray(text_parts))
+	edit.text = text
 	edit.grab_focus()
-	edit.caret_column = new_column_pos
+	edit.caret_column = text.length()
 
 	# Special case: If the edit is a SceneLineEdit, then we also need to alert it to the change
 	if edit is SceneLineEdit:

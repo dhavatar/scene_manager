@@ -1,6 +1,7 @@
 @tool
 extends EditorProperty
 
+const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
 
 # The main control for editing the property.
 var property_control: SceneLineEdit = preload("res://addons/scene_manager/property_editor/scene_line_edit.tscn").instantiate()
@@ -10,7 +11,7 @@ var current_value: SceneResource = SceneResource.new()
 var updating: bool = false
 
 
-func _init():
+func _init() -> void:
 	# Add the control as a direct child of EditorProperty node.
 	add_child(property_control)
 	# Make sure the control is able to retain the focus.
@@ -21,7 +22,7 @@ func _init():
 	property_control.text_changed.connect(_on_text_changed)
 
 
-func _on_text_changed(new_text: String):
+func _on_text_changed(new_text: String) -> void:
 	# Ignore the signal if the property is currently being updated.
 	if (updating):
 		return
@@ -29,12 +30,13 @@ func _on_text_changed(new_text: String):
 	if current_value == null:
 		current_value = SceneResource.new()
 	
-	# TODO: Convert to enum
-	current_value.string_value = new_text
+	current_value.set_text(new_text)
+
+	_update_theme()
 	emit_changed(get_edited_property(), current_value)
 
 
-func _update_property():
+func _update_property() -> void:
 	# Read the current value from the property.
 	var new_value: SceneResource = get_edited_object()[get_edited_property()]
 	if (new_value == current_value):
@@ -46,8 +48,9 @@ func _update_property():
 	if current_value == null:
 		current_value = SceneResource.new()
 
-	# TODO: Convert to num
 	current_value = new_value
+
+	_update_theme()
 	_refresh_control_text()
 
 	updating = false
@@ -58,3 +61,10 @@ func _refresh_control_text() -> void:
 		property_control.text = ""
 	else:
 		property_control.text = current_value.string_value
+
+
+func _update_theme() -> void:
+	if current_value == null or current_value.scene_value == Scenes.SceneName.NONE:
+		property_control.add_theme_stylebox_override("normal", DUPLICATE_LINE_EDIT)
+	else:
+		property_control.remove_theme_stylebox_override("normal")

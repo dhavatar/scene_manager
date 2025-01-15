@@ -5,7 +5,6 @@
 [ext_resource type="Script" path="res://addons/scene_manager/editor/popup_button.gd" id="3_nwus0"]
 [ext_resource type="Texture2D" uid="uid://djg8os8ixd00r" path="res://addons/scene_manager/icons/PlayOverlay.png" id="4_pt2e1"]
 
-
 [node name="item" type="HBoxContainer"]
 offset_right = 280.0
 offset_bottom = 20.0
@@ -36,12 +35,14 @@ icon = ExtResource("4_pt2e1")
 [node name="popup_menu" type="PopupMenu" parent="."]
 size = Vector2i(100, 28)
 visible = true
+unfocusable = true
 hide_on_item_selection = false
 
 [connection signal="tree_entered" from="." to="." method="_on_tree_entered"]
 [connection signal="tree_exited" from="." to="." method="_on_tree_exited"]
 [connection signal="button_up" from="popup_button" to="." method="_on_popup_button_button_up"]
 [connection signal="gui_input" from="key" to="." method="_on_key_gui_input"]
+[connection signal="text_changed" from="key" to="." method="_on_key_text_changed"]
 [connection signal="gui_input" from="value" to="." method="_on_value_gui_input"]
 [connection signal="mouse_entered" from="value" to="." method="_on_value_mouse_entered"]
 [connection signal="mouse_exited" from="value" to="." method="_on_value_mouse_exited"]

@@ -4,6 +4,7 @@ extends HBoxContainer
 # Nodes
 @onready var _root: Node = self
 @onready var _popup_menu: PopupMenu = find_child("popup_menu")
+@onready var _key_edit: LineEdit = get_node("key")
 @onready var _key: String = get_node("key").text
 
 var _setting: ItemSetting
@@ -25,6 +26,8 @@ func _ready() -> void:
 
 # Sets value of `key`
 func set_key(text: String) -> void:
+	# Normalize the key to be lower case without symbols and replacing spaces with underscores
+	text = SceneManagerUtils.normalize_key_string(text)
 	get_node("key").text = text
 	name = text
 	_key = text
@@ -165,6 +168,12 @@ func _on_popup_menu_index_pressed(index: int):
 # changes and key event of it was released
 func _on_key_value_text_changed() -> void:
 	_root.update_all_scene_with_key(_key, get_key(), get_value(), _setting, [get_parent().get_parent()])
+
+
+# Called by the UI when the text changes
+func _on_key_text_changed(new_text: String) -> void:
+	set_key(new_text)
+	_key_edit.caret_column = _key.length()
 
 
 # Shows a popup in UI

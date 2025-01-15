@@ -13,7 +13,7 @@ grow_vertical = 2
 [node name="AutoCompleteAssistant" type="Node" parent="." node_paths=PackedStringArray("line_edits", "menu_location_node")]
 script = ExtResource("1_qnd4x")
 line_edits = [NodePath("../FullCoverageTestControl/LineEdit")]
-terms = Array[String](["hello", "world"])
+terms = Array[String](["hello", "world", "this is a test", "testing_underscore"])
 menu_location_node = NodePath("../FullCoverageTestControl")
 
 [node name="FullCoverageTestControl" type="ColorRect" parent="."]
@@ -24,7 +24,7 @@ anchor_top = 0.05
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 0.199997
-offset_right = -719.0
+offset_right = -1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.50575, 0.64078, 0.432909, 1)

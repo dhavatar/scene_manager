@@ -46,9 +46,8 @@ func _set_current_scene() -> void:
 	var scene_file_path: String = get_tree().current_scene.scene_file_path
 	_current_scene = _get_scene_key_by_value(scene_file_path)
 
-	assert (!(_current_scene == Scenes.SceneName.NONE and !_current_scene_is_included(scene_file_path)), \
-		"Scene Manager Error: loaded scene is not defined in scene manager tool, to fix this, on Scene Manager UI panel, just once click on refresh and then save buttons respectively.")
-	if _current_scene == Scenes.SceneName.NONE:
+	# Don't do checks in the editor as the scenes loaded will not match the scene list
+	if not Engine.is_editor_hint() and _current_scene == Scenes.SceneName.NONE:
 		push_warning("loaded scene is ignored by scene manager, it means that you can not go back to this scene by 'back' key word.")
 
 
@@ -77,17 +76,17 @@ func _fade_out(speed: float) -> bool:
 	return true
 
 
-# activates `in_transition` mode
+# Activates `in_transition` mode
 func _set_in_transition() -> void:
 	_in_transition = true
 
 
-# deactivates `in_transition` mode
+# Deactivates `in_transition` mode
 func _set_out_transition() -> void:
 	_in_transition = false
 
 
-# adds current scene to `_back_buffer`
+# Adds current scene to `_back_buffer`
 func _append_stack(key: Scenes.SceneName) -> void:
 	if _back_buffer_limit == -1:
 		_back_buffer.append(_current_scene)
@@ -101,7 +100,7 @@ func _append_stack(key: Scenes.SceneName) -> void:
 	_current_scene = key
 
 
-# pops most recent added scene to `_back_buffer`
+# Pops most recent added scene to `_back_buffer`
 func _pop_stack() -> Scenes.SceneName:
 	var pop = _back_buffer.pop_back()
 	if pop:
@@ -109,7 +108,7 @@ func _pop_stack() -> Scenes.SceneName:
 	return _current_scene
 
 
-# changes scene to the previous scene
+# Changes scene to the previous scene
 func _back() -> bool:
 	var pop: Scenes.SceneName = _pop_stack()
 	if pop:
@@ -118,7 +117,7 @@ func _back() -> bool:
 	return false
 
 
-# returns the scene key of the passed scene value (scene address)
+# Returns the scene key of the passed scene value (scene address)
 func _get_scene_key_by_value(path: String) -> Scenes.SceneName:
 	for key in Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY]:
 		if Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"] == path:
@@ -128,23 +127,25 @@ func _get_scene_key_by_value(path: String) -> Scenes.SceneName:
 	return Scenes.SceneName.NONE
 
 
+# Returns the 
 func _get_scene_value(scene: Scenes.SceneName) -> String:
 	# The enums are normalized to have all caps, but the keys in the scenes may not have that,
 	# do a string comparison with everything normalized.
 	var scene_name: String = SceneManagerUtils.get_string_from_enum(scene)
 	for key in Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY]:
-		if scene_name == SceneManagerUtils.normalize_string(key):
+		if scene_name == SceneManagerUtils.normalize_enum_string(key):
 			return Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"]
+	
 	return ""
 
 
-# restart the same scene
+# Restart the currently loaded scene
 func _refresh() -> bool:
 	get_tree().change_scene_to_file(_get_scene_value(_current_scene))
 	return true
 
 
-# checks different states of scene and make actual transitions happen
+# Checks different states of scene and make actual transitions happen
 func _change_scene(scene: Scenes.SceneName, add_to_back: bool) -> bool:
 	get_tree().change_scene_to_file(_get_scene_value(scene))
 	if add_to_back:
@@ -152,7 +153,7 @@ func _change_scene(scene: Scenes.SceneName, add_to_back: bool) -> bool:
 	return true
 
 
-# makes menu clickable or unclickable during transitions
+# Makes menu clickable or unclickable during transitions
 func _set_clickable(clickable: bool) -> void:
 	if clickable:
 		_fade_color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -160,14 +161,14 @@ func _set_clickable(clickable: bool) -> void:
 		_fade_color_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 
 
-# sets color if timeout exists
+# Sets color if timeout exists
 func _timeout(timeout: float) -> bool:
 	if timeout != 0:
 		return true
 	return false
 
 
-# used for interactive change scene
+# Used for interactive change scene
 func _process(_delta: float) -> void:
 	var prevPercent: int = 0
 	if len(_load_progress) != 0:

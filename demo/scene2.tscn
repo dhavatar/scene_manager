@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://8wqvcf8n7njw"]
+[gd_scene load_steps=5 format=3 uid="uid://8wqvcf8n7njw"]
 
 [ext_resource type="Script" path="res://demo/button.gd" id="1"]
+[ext_resource type="Script" path="res://addons/scene_manager/scene_resource.gd" id="2_yvd4w"]
+
+[sub_resource type="Resource" id="Resource_tef5p"]
+script = ExtResource("2_yvd4w")
+string_value = "LOADING"
+scene_value = 0
+
+[sub_resource type="Resource" id="Resource_lmp1c"]
+script = ExtResource("2_yvd4w")
+string_value = "SCENE3"
+scene_value = 4
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -38,7 +49,7 @@ text = "LOADING
 
 SCREEN"
 script = ExtResource("1")
-scene = 4
+scene = SubResource("Resource_tef5p")
 fade_in_speed = 2.0
 color = Color(0.623529, 0.2, 0.588235, 1)
 timeout = 0.2
@@ -54,7 +65,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "SCENE 2"
 script = ExtResource("1")
-scene = 4
+scene = SubResource("Resource_lmp1c")
 color = Color(0.172549, 0.176471, 0.129412, 1)
 timeout = 0.5
 
