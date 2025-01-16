@@ -195,32 +195,61 @@ func get_all_sublists_names_except(excepts: Array = [""]) -> Array:
 
 # Returns all scenes from the included directories.
 func _get_scenes(includes: Array) -> Dictionary:
+	# Loop through the includes and recursively get all files from the directories.
+	# If it's a file, add the file directly.
+	var files: Dictionary = {}
+
+	for include_dir: String in includes:
+		var dir := DirAccess.open(include_dir)
+		if not dir: # If it's a file
+			if (!FileAccess.file_exists(include_dir)):
+				print ("Couldn't open ", include_dir)
+			else:
+				if include_dir.get_extension() == "tscn":
+					files[include_dir.get_basename().get_file()] = include_dir
+				else:
+					# Any other file extension isn't handled
+					continue
+		else:
+			var new_files = _get_scenes_helper(include_dir)
+			if len(new_files) != 0:
+				_merge_dict(files, new_files)
+	
+	return files
+
+
+# Helper recursive function to traversing a directory recursively to storing all relevant files.
+func _get_scenes_helper(root_path: String) -> Dictionary:
 	var files: Dictionary = {}
 	var folders: Array = []
+	var dir := DirAccess.open(root_path)
+	var original_root_path = root_path
 	
-	for include_dir in includes:
-		var dir := DirAccess.open(include_dir)
-
-		# Make sure there's a trailing slash at the end
-		if include_dir[len(include_dir) - 1] != "/":
-			include_dir = include_dir + "/"
-
+	if root_path[len(root_path) - 1] != "/":
+		root_path = root_path + "/"
+	 
+	if dir:
 		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 
-		if dir.file_exists(include_dir + ".gdignore"):
-			continue
+		if dir.file_exists(root_path + ".gdignore"):
+			return files
 		
 		while true:
 			var file_folder = dir.get_next()
-			var exact_address = include_dir + file_folder
+			var exact_address = root_path + file_folder
 			if file_folder == "":
 				break
 			elif dir.current_is_dir():
-				continue
+				folders.append(file_folder)
 			elif file_folder.get_extension() == "tscn":
-				files[file_folder.replace("." + file_folder.get_extension(), "")] = exact_address
+				files[file_folder.get_basename().get_file()] = exact_address
 
 		dir.list_dir_end()
+
+		for folder in folders:
+			var new_files: Dictionary = _get_scenes_helper(root_path + folder)
+			if len(new_files) != 0:
+				_merge_dict(files, new_files)
 
 	return files
 
@@ -677,7 +706,8 @@ func _on_add_button_up():
 	_add_button.disabled = true
 	if _auto_save_button.get_meta("enabled", false):
 		_save_all(_create_save_dic())
-	_reload_scenes()
+	_on_refresh_button_up()
+
 
 # Pops up file dialog to select a folder to include
 func _on_file_dialog_button_button_up():

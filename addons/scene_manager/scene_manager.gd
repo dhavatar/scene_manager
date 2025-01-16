@@ -7,7 +7,7 @@ const DEFAULT_TREE_NODE: String = "World" ## Default node name to be used for lo
 
 ## Enums for how to load the scene.[br]
 ## Default will make it so only one scene will exist for the node.[br]
-## Additive
+## Additive will add the scene to the node along with anything else loaded.
 enum SceneLoading { DEFAULT, ADDITIVE }
 
 # Built in fade in/out for scene loading
@@ -18,7 +18,6 @@ enum SceneLoading { DEFAULT, ADDITIVE }
 @onready var _back_buffer_limit: int = -1
 @onready var _current_scene: Scenes.SceneName = Scenes.SceneName.NONE
 @onready var _first_time: bool = true
-@onready var _reserved_keys: Array = ["none"]
 
 var _load_scene: String = "" ## Scene path that is currently loading
 var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of the scene that's currently loading

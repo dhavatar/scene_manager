@@ -33,6 +33,9 @@ static func normalize_enum_string(text: String) -> String:
 
 ## Returns a string that has no symbols, is lower cases, and spaces are underscores.
 static func normalize_key_string(text: String) -> String:
+	if text.is_empty():
+		return text
+	
 	var regex := RegEx.new()
 	regex.compile("[^a-zA-Z0-9_ -]")
 	var result := regex.search(text)

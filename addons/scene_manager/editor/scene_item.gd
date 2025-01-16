@@ -2,6 +2,7 @@
 extends HBoxContainer
 
 const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
+const INVALID_KEY_NAME: String = "none"
 
 # Nodes
 @onready var _root: Node = self
@@ -190,7 +191,7 @@ func _on_key_text_submitted(new_text:String) -> void:
 
 # Checks to see if the key is something invalid for an enum value.
 func _check_invalid_values() -> void:
-	if _key == "":
+	if _key.is_empty() or _key == INVALID_KEY_NAME:
 		custom_set_theme(DUPLICATE_LINE_EDIT)
 
 

@@ -15,3 +15,5 @@ line_edits = [NodePath("..")]
 terms = Array[String](["a", "b", "c"])
 is_editor_inspector = true
 case_sensitive_match = false
+disable_east = true
+disable_west = true
