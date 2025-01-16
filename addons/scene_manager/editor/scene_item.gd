@@ -1,6 +1,8 @@
 @tool
 extends HBoxContainer
 
+const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
+
 # Nodes
 @onready var _root: Node = self
 @onready var _popup_menu: PopupMenu = find_child("popup_menu")
@@ -11,10 +13,11 @@ var _setting: ItemSetting
 var _sub_section: Control
 var _list: Control
 var _mouse_is_over_value: bool
-
+var _previous_value: String
 
 # Finds and fills `_root` variable properly
 func _ready() -> void:
+	_previous_value = _key
 	while true:
 		if _root == null:
 			## If we are here, we are running in editor, so get out
@@ -176,24 +179,19 @@ func _on_key_text_changed(new_text: String) -> void:
 	_key_edit.caret_column = _key.length()
 
 
-# Shows a popup in UI
-func _show_message() -> void:
-	var reserved_keys: String = ""
-	for i in range(len(_root.reserved_keys)):
-		if i == 0:
-			reserved_keys += "\"" + _root.reserved_keys[0] + "\""
-			continue
-		reserved_keys += ", \"" + _root.reserved_keys[i] + "\""
-	
-	_root.show_message("Error", "\"%s\" and an empty string(\"\"), or every other word which will "%
-		reserved_keys + "begin with an '_', are reserved or not allowed to be used as a scene " +
-		"key so please do not use them to avoid seeing weird reaction from Scene Manager tool.")
+# Called by the UI when focus is off of the line edit
+func _on_key_focus_exited() -> void:
+	_submit_key()
 
 
-# Checks if current value for LineEdit is in reserved keys or not
-func _check_reserved_keys() -> void:
-	if get_key() == "" || get_key().begins_with("_") || get_key() in _root.reserved_keys:
-		_show_message()
+func _on_key_text_submitted(new_text:String) -> void:
+	_submit_key()
+
+
+# Checks to see if the key is something invalid for an enum value.
+func _check_invalid_values() -> void:
+	if _key == "":
+		custom_set_theme(DUPLICATE_LINE_EDIT)
 
 
 # When a gui_input happens on LineEdit, this function triggers
@@ -203,14 +201,15 @@ func _on_key_gui_input(event: InputEvent) -> void:
 			return
 		
 		# Runs when InputEventKey is released
-		if get_key() == "":
-			_show_message()
-		elif get_key() != _key:
-			_check_reserved_keys()
-			_on_key_value_text_changed()
-			_key = get_key()
-			_root.check_duplication()
-			_root.item_renamed.emit(self)
+		_root.check_duplication()
+		_check_invalid_values()
+
+
+# Emits a signal if the key value is different than it was at the start
+func _submit_key() -> void:
+	if _previous_value != _key:
+		_previous_value = _key
+		_root.item_renamed.emit(self)
 
 
 # When added

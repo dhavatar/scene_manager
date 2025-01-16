@@ -4,7 +4,7 @@ extends Node
 # Scene itema and sub_section to instance and add in list
 const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 const SUB_SECTION = preload("res://addons/scene_manager/editor/sub_section.tscn")
-# Duplicate + normal scene theme
+# Duplicate/invalid + normal scene theme
 const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
 # Open close icons
 const EYE_OPEN = preload("res://addons/scene_manager/icons/eye_open.png")
@@ -200,7 +200,7 @@ func check_duplication() -> Array:
 	return arr
 
 
-# Reset theme for all children in UI
+## Reset theme for all children in UI
 func set_reset_theme_for_all() -> void:
 	for i in range(_container.get_child_count()):
 		var children: Array[Node] = _container.get_child(i).get_items()
@@ -208,7 +208,7 @@ func set_reset_theme_for_all() -> void:
 			children[j].remove_custom_theme()
 
 
-# Sets duplicate theme for children in passed list in UI
+## Sets duplicate theme for children in passed list in UI
 func set_duplicate_theme(list: Array) -> void:
 	for i in range(_container.get_child_count()):
 		var children: Array[Node] = _container.get_child(i).get_items()

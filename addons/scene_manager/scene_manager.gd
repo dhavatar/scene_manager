@@ -2,7 +2,15 @@ extends Node
 ## Main SceneManager that handles adding scenes and transitions.
 
 const FADE: String = "fade"
+const DEFAULT_FADE_TIME: float = 1.0
+const DEFAULT_TREE_NODE: String = "World" ## Default node name to be used for loading scenes
 
+## Enums for how to load the scene.[br]
+## Default will make it so only one scene will exist for the node.[br]
+## Additive
+enum SceneLoading { DEFAULT, ADDITIVE }
+
+# Built in fade in/out for scene loading
 @onready var _fade_color_rect: ColorRect = find_child("fade")
 @onready var _animation_player: AnimationPlayer = find_child("animation_player")
 @onready var _in_transition: bool = false
@@ -10,13 +18,13 @@ const FADE: String = "fade"
 @onready var _back_buffer_limit: int = -1
 @onready var _current_scene: Scenes.SceneName = Scenes.SceneName.NONE
 @onready var _first_time: bool = true
-@onready var _patterns: Dictionary = {}
 @onready var _reserved_keys: Array = ["none"]
 
 var _load_scene: String = "" ## Scene path that is currently loading
 var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of the scene that's currently loading
 var _load_progress: Array = []
 var _recorded_scene: Scenes.SceneName = Scenes.SceneName.NONE
+var _loaded_scene_map: Dictionary = {} ## Keeps track of all loaded scenes and the node they belong to
 
 signal load_finished
 signal load_percent_changed(value: int)
@@ -259,7 +267,10 @@ func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
 
 
 ## Changes current scene to the specified scene.
-func change_scene(scene: Scenes.SceneName, fade_out_time: float, fade_in_time: float, general_options: GeneralOptions) -> void:
+func change_scene(scene: Scenes.SceneName, 
+		fade_out_time: float = DEFAULT_FADE_TIME,
+		fade_in_time: float = DEFAULT_FADE_TIME,
+		general_options: GeneralOptions = create_general_options()) -> void:
 	_first_time = false
 	_set_in_transition()
 	_set_clickable(general_options.clickable)

@@ -107,10 +107,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="file_dialog" type="FileDialog" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container"]
-mode = 2
 title = "Open a File or Directory"
+size = Vector2i(303, 180)
 ok_button_text = "Open"
 file_mode = 3
+filters = PackedStringArray("*.tscn")
 
 [node name="file_dialog_button" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container"]
 custom_minimum_size = Vector2(28, 28)
