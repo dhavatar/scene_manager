@@ -56,7 +56,7 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 # Example: { "res://demo/scene3.tscn": ["Character", "Menu"] }
 var _sections: Dictionary = {}
 var reserved_keys: Array = ["none"]
-var _timer: Timer = null
+var _autosave_timer: Timer = null ## Timer for autosave when the key changes
 var _just_saved_timer: Timer = null ## Keep track of if the file just changed to prevent the tab from reloading when unnecessary
 
 # UI signal callbacks
@@ -84,11 +84,11 @@ func _ready() -> void:
 	self.added_to_sub_section.connect(_on_added_to_sub_section)
 
 	# Create a new Timer node to write to the scenes.gd file when the timer ends
-	_timer = Timer.new()
-	_timer.wait_time = 0.5
-	_timer.one_shot = true
-	add_child(_timer)
-	_timer.timeout.connect(_on_timer_timeout)
+	_autosave_timer = Timer.new()
+	_autosave_timer.wait_time = 0.5
+	_autosave_timer.one_shot = true
+	add_child(_autosave_timer)
+	_autosave_timer.timeout.connect(_on_timer_timeout)
 
 	# Create a Timer for keeping track of when the scenes was just saved
 	_just_saved_timer = Timer.new()
@@ -119,8 +119,8 @@ func _on_timer_timeout() -> void:
 
 func _on_item_renamed(node: Node) -> void:
 	if _auto_save_button.get_meta("enabled", false):
-		_timer.wait_time = 0.5
-		_timer.start()
+		_autosave_timer.wait_time = 0.5
+		_autosave_timer.start()
 
 
 func _on_item_visibility_changed(node: Node, visibility: bool) -> void:
