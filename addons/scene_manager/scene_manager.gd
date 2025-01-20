@@ -50,10 +50,6 @@ func _ready() -> void:
 	var scene_file_path: String = get_tree().current_scene.scene_file_path
 	_current_scene = _get_scene_key_by_value(scene_file_path)
 
-	# Don't do checks in the editor as the scenes loaded will not match the scene list
-	if not Engine.is_editor_hint() and _current_scene == Scenes.SceneName.NONE:
-		push_warning("loaded scene is ignored by scene manager, it means that you can not go back to this scene by 'back' key word.")
-
 	call_deferred("_on_initial_setup")
 
 
