@@ -36,5 +36,5 @@ func loading_finished() -> void:
 
 
 func _on_next_button_up():
-	var general_options := SceneManager.create_general_options(Color(0, 0, 0), 0, false, true)
-	SceneManager.change_scene_to_existing_scene_in_scene_tree(1.0, 1.0, general_options)
+	var general_options := SceneManager.create_load_options()
+	SceneManager.change_scene_to_existing_scene_in_scene_tree(general_options)

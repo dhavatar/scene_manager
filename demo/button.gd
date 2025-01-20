@@ -1,32 +1,37 @@
 extends Button
 
 @export var scene: SceneResource
+@export var mode: SceneManager.SceneLoadingMode
 @export var fade_out_speed: float = 1.0
 @export var fade_in_speed: float = 1.0
-@export var color: Color = Color(0, 0, 0)
-@export var timeout: float = 0.0
 @export var clickable: bool = false
 @export var add_to_back: bool = true
 
-@onready var general_options := SceneManager.create_general_options(color, timeout, clickable, add_to_back)
+@onready var general_options := SceneManager.create_load_options(
+		SceneManager.DEFAULT_TREE_NODE_NAME,
+		mode,
+		clickable,
+		fade_out_speed,
+		fade_in_speed,
+		add_to_back)
 
 
 func _on_button_button_up():
-	SceneManager.change_scene(scene.scene_value, fade_out_speed, fade_in_speed, general_options)
+	SceneManager.load_scene(scene.scene_value, general_options)
 
 
 func _on_reset_button_up():
-	SceneManager.reset_scene_manager()
+	SceneManager.clear_back_buffer()
 
 
 func _on_loading_scene_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.change_scene(Scenes.SceneName.LOADING, fade_out_speed, fade_in_speed, general_options)
+	SceneManager.load_scene(Scenes.SceneName.LOADING, general_options)
 
 
 func _on_loading_scene_initialization_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.change_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, fade_out_speed, fade_in_speed, general_options)
+	SceneManager.load_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, general_options)
 
 
 func _on_pause_and_resume_button_up():
