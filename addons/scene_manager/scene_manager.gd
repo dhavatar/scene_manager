@@ -8,9 +8,10 @@ const _MAP_PARENT_INDEX: int = 0 # Index to the loaded scene map for the parent 
 const _MAP_SCENE_INDEX: int = 1 # Index to the loaded scene map for the scene node
 
 ## Enums for how to load the scene.[br]
-## Single will make it so only one scene will exist for the node.[br]
+## Single will make it so only one scene will exist for the whole tree. Default option.[br]
+## Single_Node will make it so only one scene will exist for the specified node.[br]
 ## Additive will add the scene to the node along with anything else loaded.
-enum SceneLoadingMode { SINGLE, ADDITIVE }
+enum SceneLoadingMode { SINGLE, SINGLE_NODE, ADDITIVE }
 
 # Built in fade in/out for scene loading
 @onready var _fade_color_rect: ColorRect = find_child("fade")
@@ -274,7 +275,7 @@ func load_scene(scene: Scenes.SceneName,
 	if scene == Scenes.SceneName.NONE:
 		push_warning("Attempted to load a NONE scene. Skipping load as it won't work.")
 		return
-	
+
 	_set_in_transition()
 	_set_clickable(load_options.clickable)
 
@@ -288,10 +289,15 @@ func load_scene(scene: Scenes.SceneName,
 	# the scene into the default node.
 	var parent_node: Node = null
 	var new_scene_node: Node = null
-	if load_options.mode == SceneLoadingMode.SINGLE:
-		# If the node currently exists, completely remove it and recreate a blank node after
-		if root.has_node(load_options.node_name):
-			_unload_node(load_options.node_name)
+	if load_options.mode == SceneLoadingMode.SINGLE or load_options.mode == SceneLoadingMode.SINGLE_NODE:
+		# For the Single case, remove all nodes. For the Single Node case, only remove the specified
+		# node in the options.
+		if load_options.mode == SceneLoadingMode.SINGLE:
+			_unload_all_nodes()
+		else:
+			# If the node currently exists, completely remove it and recreate a blank node after
+			if root.has_node(load_options.node_name):
+				_unload_node(load_options.node_name)
 		
 		parent_node = Node.new()
 		parent_node.name = load_options.node_name
@@ -324,7 +330,7 @@ func load_scene(scene: Scenes.SceneName,
 	_loaded_scene_map[scene] = [parent_node, new_scene_node]
 	_current_scene = scene
 	scene_loaded.emit()
-	
+
 	if _fade_in(load_options.fade_in_time):
 		await _animation_player.animation_finished
 		fade_in_finished.emit()
@@ -357,6 +363,22 @@ func _unload_node(node_name: String) -> void:
 			_loaded_scene_map.erase(key)
 	
 	get_tree().root.get_node(node_name).free()
+
+
+## Frees all scene related nodes in the loaded scene map.[br]
+## Used mainly for Single scene loading which will unload all scenes. 
+func _unload_all_nodes() -> void:
+	# Get a list of all unique parent nodes to remove
+	# Using the dictionary keys as a set.
+	var unique_nodes := {}
+	for key in _loaded_scene_map:
+		if not unique_nodes.has(_loaded_scene_map[key][_MAP_PARENT_INDEX]):
+			unique_nodes[_loaded_scene_map[key][_MAP_PARENT_INDEX]] = null
+	
+
+	# Go through each parent node and unload them
+	for node in unique_nodes:
+		_unload_node(node.name)
 
 
 ## Loads a scene from the specified file path and returns the Node for it.[br]
@@ -502,7 +524,7 @@ func get_recorded_scene() -> Scenes.SceneName:
 
 
 ## Pause (fadeout). You can resume afterwards.
-func pause(fade_out_time: float, general_options: SceneLoadOptions) -> void:
+func pause(fade_out_time: float, general_options: SceneLoadOptions = create_load_options()) -> void:
 	_set_in_transition()
 	_set_clickable(general_options.clickable)
 	
@@ -512,7 +534,7 @@ func pause(fade_out_time: float, general_options: SceneLoadOptions) -> void:
 
 
 ## Resume (fadein) after pause
-func resume(fade_in_time: float, general_options: SceneLoadOptions) -> void:
+func resume(fade_in_time: float, general_options: SceneLoadOptions = create_load_options()) -> void:
 	_set_clickable(general_options.clickable)
 	
 	if _fade_in(fade_in_time):

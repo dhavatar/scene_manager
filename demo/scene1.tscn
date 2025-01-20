@@ -55,10 +55,7 @@ text = "LOADING
 SCREEN"
 script = ExtResource("1")
 scene = SubResource("Resource_1cdln")
-mode = null
-fade_out_speed = null
 fade_in_speed = 2.0
-clickable = null
 add_to_back = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
@@ -72,11 +69,7 @@ theme_override_font_sizes/font_size = 32
 text = "SCENE 1"
 script = ExtResource("1")
 scene = SubResource("Resource_eu1f2")
-mode = null
-fade_out_speed = null
 fade_in_speed = 2.0
-clickable = null
-add_to_back = null
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -88,11 +81,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "RESET"
 script = ExtResource("1")
-mode = null
-fade_out_speed = null
-fade_in_speed = null
-clickable = null
-add_to_back = null
 
 [node name="reload" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -100,11 +88,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "RELOAD"
 script = ExtResource("1")
-mode = null
 fade_out_speed = 0.2
 fade_in_speed = 0.2
-clickable = null
-add_to_back = null
 
 [node name="back" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -112,11 +97,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "BACK"
 script = ExtResource("1")
-mode = null
 fade_out_speed = 0.5
 fade_in_speed = 0.5
-clickable = null
-add_to_back = null
 
 [node name="load_additively" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -128,8 +110,6 @@ scene = SubResource("Resource_krcu7")
 mode = 1
 fade_out_speed = 0.5
 fade_in_speed = 0.5
-clickable = null
-add_to_back = null
 
 [node name="pause_and_resume" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -137,11 +117,8 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "PAUSE 3 SECONDS"
 script = ExtResource("1")
-mode = null
 fade_out_speed = 0.5
 fade_in_speed = 0.5
-clickable = null
-add_to_back = null
 
 [node name="exit" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
@@ -149,11 +126,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "EXIT"
 script = ExtResource("1")
-mode = null
 fade_out_speed = 0.3
-fade_in_speed = null
-clickable = null
-add_to_back = null
 
 [node name="check" type="CheckButton" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -163,6 +136,6 @@ layout_mode = 2
 [connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reset" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reset" method="_on_reset_button_up"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" method="_on_reload_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" method="_on_back_pressed"]
-[connection signal="button_up" from="CenterContainer/VBoxContainer/load_additively" to="CenterContainer/VBoxContainer/load_additively" method="_on_button_button_up"]
+[connection signal="button_up" from="CenterContainer/VBoxContainer/load_additively" to="CenterContainer/VBoxContainer/load_additively" method="_on_button_additive_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/pause_and_resume" to="CenterContainer/VBoxContainer/loading_scene" method="_on_pause_and_resume_button_up"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/exit" to="CenterContainer/VBoxContainer/exit" method="_on_exit_pressed"]

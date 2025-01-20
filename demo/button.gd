@@ -7,18 +7,16 @@ extends Button
 @export var clickable: bool = false
 @export var add_to_back: bool = true
 
-@onready var general_options := SceneManager.create_load_options(
-		SceneManager.DEFAULT_TREE_NODE_NAME,
-		mode,
-		clickable,
-		fade_out_speed,
-		fade_in_speed,
-		add_to_back)
-
 
 func _on_button_button_up():
-	SceneManager.load_scene(scene.scene_value, general_options)
+	SceneManager.load_scene(scene.scene_value)
 
+func _on_button_additive_up():
+	var options := SceneManager.SceneLoadOptions.new()
+	options.mode = SceneManager.SceneLoadingMode.ADDITIVE
+	options.fade_in_time = 0
+	options.fade_out_time = 0
+	SceneManager.load_scene(scene.scene_value, options)
 
 func _on_reset_button_up():
 	SceneManager.clear_back_buffer()
@@ -26,18 +24,18 @@ func _on_reset_button_up():
 
 func _on_loading_scene_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.load_scene(Scenes.SceneName.LOADING, general_options)
+	SceneManager.load_scene(Scenes.SceneName.LOADING)
 
 
 func _on_loading_scene_initialization_button_up():
 	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.load_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION, general_options)
+	SceneManager.load_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION)
 
 
 func _on_pause_and_resume_button_up():
-	await SceneManager.pause(fade_out_speed, general_options)
+	await SceneManager.pause(fade_out_speed)
 	await get_tree().create_timer(3).timeout
-	await SceneManager.resume(fade_in_speed, general_options)
+	await SceneManager.resume(fade_in_speed)
 
 
 func _on_back_pressed() -> void:
