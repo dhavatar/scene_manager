@@ -18,7 +18,6 @@ enum SceneLoadingMode { SINGLE, ADDITIVE }
 @onready var _in_transition: bool = false
 @onready var _back_buffer: RingBuffer = RingBuffer.new()
 @onready var _current_scene: Scenes.SceneName = Scenes.SceneName.NONE
-@onready var _first_time: bool = true
 
 var _load_scene: String = "" ## Scene path that is currently loading
 var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of the scene that's currently loading
@@ -98,7 +97,12 @@ func _on_initial_setup() -> void:
 	default_node.add_child(scene_node)
 	root.add_child(default_node)
 
-	_loaded_scene_map[_current_scene] = [default_node, scene_node]
+	# Don't map a NONE scene as that shouldn't be here. It's possible to reach here
+	# if the loaded scene wasn't part of the enums and loaded some other way.
+	if _current_scene != Scenes.SceneName.NONE:
+		_loaded_scene_map[_current_scene] = [default_node, scene_node]
+	else:
+		push_warning("Loaded scene not added to the mapping due to being NONE.")
 
 
 # `speed` unit is in seconds
@@ -148,7 +152,7 @@ func _pop_stack() -> Scenes.SceneName:
 # Note this assumes Single loading and will remove any additive scenes with default options.
 func _back() -> bool:
 	var pop: Scenes.SceneName = _pop_stack()
-	if pop != Scenes.SceneName.NONE:
+	if pop != Scenes.SceneName.NONE and _current_scene != Scenes.SceneName.NONE:
 		# Use the same parent node the scene currently has to keep it consistent.
 		var load_options := SceneLoadOptions.new()
 		load_options.node_name = _loaded_scene_map[_current_scene][_MAP_PARENT_INDEX].name
@@ -271,7 +275,10 @@ func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
 ## By default it will swap the scene with the one already loaded in the default tree node.
 func load_scene(scene: Scenes.SceneName,
 		load_options: SceneLoadOptions = create_load_options()) -> void:
-	_first_time = false
+	if scene == Scenes.SceneName.NONE:
+		push_warning("Attempted to load a NONE scene. Skipping load as it won't work.")
+		return
+	
 	_set_in_transition()
 	_set_clickable(load_options.clickable)
 
