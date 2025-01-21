@@ -374,7 +374,6 @@ func _unload_all_nodes() -> void:
 	for key in _loaded_scene_map:
 		if not unique_nodes.has(_loaded_scene_map[key][_MAP_PARENT_INDEX]):
 			unique_nodes[_loaded_scene_map[key][_MAP_PARENT_INDEX]] = null
-	
 
 	# Go through each parent node and unload them
 	for node in unique_nodes:

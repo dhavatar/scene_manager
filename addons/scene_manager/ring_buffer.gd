@@ -67,7 +67,6 @@ func push(item) -> void:
 	_ring_buffer[_head_index] = item
 	_head_index = (_head_index + 1) % _capacity
 	_size = mini(_size + 1, _capacity)
-	print("PUSH: head %d tail %d size %d ring_size %d" % [_head_index, _tail_index, _size, _ring_buffer.size()])
 
 
 ## Removes the most recent item from the ring buffer.
@@ -84,5 +83,4 @@ func pop() -> Variant:
 	_ring_buffer[_head_index] = null
 	_size -= 1
 
-	print("POP: head %d tail %d size %d ring_size %d" % [_head_index, _tail_index, _size, _ring_buffer.size()])
 	return item
