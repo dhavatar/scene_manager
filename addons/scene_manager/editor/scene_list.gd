@@ -236,11 +236,12 @@ func add_subsection(text: String) -> Control:
 
 # List deletion
 func _on_delete_list_button_up() -> void:
+	var section_name = self.name
 	if self.name == "All":
 		return
 	queue_free()
 	await self.tree_exited
-	_root.section_removed.emit(self)
+	_root.section_removed.emit(self, section_name)
 
 
 # Refreshes `visible` of all items in list

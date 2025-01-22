@@ -203,9 +203,6 @@ text = "Reactive"
 icon = ExtResource("7_3r2fd")
 metadata/enabled = true
 
-[node name="accept_dialog" type="AcceptDialog" parent="."]
-dialog_autowrap = true
-
 [connection signal="tab_changed" from="main_container/scenes/tab_container" to="." method="_on_tab_container_tab_changed"]
 [connection signal="text_changed" from="main_container/add_category_container/add_category_container/section_name" to="." method="_on_section_name_text_changed"]
 [connection signal="button_up" from="main_container/add_category_container/add_category_container/HBoxContainer/add_subsection" to="." method="_on_add_subsection_button_up"]
