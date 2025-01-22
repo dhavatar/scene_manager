@@ -6,17 +6,14 @@
 [sub_resource type="Resource" id="Resource_1cdln"]
 script = ExtResource("2_kckjn")
 string_value = "LOADING"
-scene_value = 0
 
 [sub_resource type="Resource" id="Resource_eu1f2"]
 script = ExtResource("2_kckjn")
 string_value = "SCENE2"
-scene_value = 3
 
 [sub_resource type="Resource" id="Resource_krcu7"]
 script = ExtResource("2_kckjn")
 string_value = "SCENE3"
-scene_value = 4
 
 [node name="Control" type="Control"]
 layout_mode = 3
