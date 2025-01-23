@@ -37,29 +37,14 @@ func _ready() -> void:
 		_delete_list_button.disabled = true
 		_delete_list_button.focus_mode = Control.FOCUS_NONE
 
-		var sub = SUB_SECTION.instantiate()
-		sub._root = _root
-		sub.name = "Uncategorized"
-		_container.add_child(sub)
-		sub.open()
-		sub.hide_delete_button()
-		_main_subsection = sub
-
-		var sub2 = SUB_SECTION.instantiate()
-		sub._root = _root
-		sub2.name = "Categorized"
-		_container.add_child(sub2)
-		sub2.hide_delete_button()
-		_secondary_subsection = sub2
-	else:
-		var sub = SUB_SECTION.instantiate()
-		sub._root = _root
-		sub.name = "All"
-		sub.visible = false
-		_container.add_child(sub)
-		sub.open()
-		sub.hide_delete_button()
-		_main_subsection = sub
+	var sub = SUB_SECTION.instantiate()
+	sub._root = _root
+	sub.name = "All"
+	sub.visible = false
+	_container.add_child(sub)
+	sub.open()
+	sub.hide_delete_button()
+	_main_subsection = sub
 
 
 # Determines item can be visible with current settings or not
@@ -77,20 +62,15 @@ func add_item(key: String, value: String, setting: ItemSetting) -> void:
 	item.set_setting(setting)
 	item.visible = determine_item_visibility(setting)
 	item._list = self
-	if name == "All":
-		if !setting.categorized:
-			_main_subsection.add_item(item)
+
+	if setting.subsection != "":
+		var subsection = find_subsection(setting.subsection)
+		if subsection:
+			subsection.add_item(item)
 		else:
-			_secondary_subsection.add_item(item)
+			add_subsection(setting.subsection).add_item(item)
 	else:
-		if setting.subsection != "":
-			var subsection = find_subsection(setting.subsection)
-			if subsection:
-				subsection.add_item(item)
-			else:
-				add_subsection(setting.subsection).add_item(item)
-		else:
-			_main_subsection.add_item(item)
+		_main_subsection.add_item(item)
 
 
 # Finds and returns a sub_section in the list

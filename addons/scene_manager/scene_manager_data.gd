@@ -110,6 +110,7 @@ func remove_section(section_name: String) -> void:
 	for key in scenes:
 		if scenes[key]["sections"].has(section_name):
 			scenes[key]["sections"].erase(section_name)
+			scenes[key]["settings"].erase(section_name)
 
 
 ## Adds `section_name` to associate to `scene_address`.
@@ -127,6 +128,7 @@ func add_scene_to_section(scene_address: String, section_name: String) -> void:
 	for key in scenes:
 		if scenes[key]["value"] == scene_address:
 			scenes[key]["sections"].append(section_name)
+			scenes[key]["settings"][section_name] = ItemSetting.default().as_dictionary()
 			break
 
 

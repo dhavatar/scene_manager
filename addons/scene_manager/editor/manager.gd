@@ -181,7 +181,8 @@ func _get_lists_nodes() -> Array:
 	return _tab_container.get_children()
 
 
-# Returns node of a specific list in UI
+# Returns node of a specific list in UI.
+# Note that the Node is part of `scene_list.gd` and has access to those functions.
 func _get_one_list_node_by_name(name: String) -> Node:
 	for node in _get_lists_nodes():
 		if name.capitalize() == node.name:
@@ -189,28 +190,10 @@ func _get_one_list_node_by_name(name: String) -> Node:
 	return null
 
 
-# Removes and add in `All` section so that it updates its place in list
-func _refresh_all_list(scene_name: String, scene_address: String) -> void:
-	var all_list = _get_one_list_node_by_name("All")
-	var setting = all_list.get_node_by_scene_address(scene_address).get_setting()
-	all_list.remove_item(scene_name, scene_address)
-	setting.categorized = _data.has_sections(scene_address)
-	await all_list.add_item(scene_name, scene_address, setting)
-
-
 # Removes a scene from a specific list
 func remove_scene_from_list(section_name: String, scene_name: String, scene_address: String) -> void:
 	var list: Node = _get_one_list_node_by_name(section_name)
 	list.remove_item(scene_name, scene_address)
-	_refresh_all_list(scene_name, scene_address)
-
-
-# Adds the scene to the UI list of scenes
-func _add_scene_to_ui_list(list_name: String, scene_name: String, scene_address: String, setting: ItemSetting) -> void:
-	var list: Node = _get_one_list_node_by_name(list_name)
-	if list == null:
-		return
-	await list.add_item(scene_name, scene_address, setting)
 
 
 ## Adds an item to a list
@@ -219,8 +202,10 @@ func _add_scene_to_ui_list(list_name: String, scene_name: String, scene_address:
 ## to do, removes and again adds the item in `All` section so that it can be placed
 ## in correct place in correct section.
 func add_scene_to_list(list_name: String, scene_name: String, scene_address: String, setting: ItemSetting) -> void:
-	_add_scene_to_ui_list(list_name, scene_name, scene_address, setting)
-	_refresh_all_list(scene_name, scene_address)
+	var list: Node = _get_one_list_node_by_name(list_name)
+	if list == null:
+		return
+	await list.add_item(scene_name, scene_address, setting)
 
 
 # Adds an address to the include list
@@ -254,11 +239,12 @@ func _clear_all() -> void:
 func _reload_ui_scenes() -> void:
 	for key in _data.scenes:
 		var scene = _data.scenes[key]
-		var settings := ItemSetting.dictionary_to_item_setting(scene["settings"])
 		for section in scene["sections"]:
-			_add_scene_to_ui_list(section, key, scene["value"], settings)
+			var settings := ItemSetting.dictionary_to_item_setting(scene["settings"][section])
+			add_scene_to_list(section, key, scene["value"], settings)
 		
-		_add_scene_to_ui_list("All", key, scene["value"], settings)
+		var all_settings := ItemSetting.dictionary_to_item_setting(scene["settings"]["All"])
+		add_scene_to_list("All", key, scene["value"], all_settings)
 
 
 # Reloads include list in UI
