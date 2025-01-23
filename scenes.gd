@@ -7,8 +7,87 @@ extends Node
 
 # [Scene Enum]
 enum SceneName \
-{ NONE = -1, LOADING, LOADING_WITH_INITIALIZATION, SCENE1, SCENE2, SCENE3, SCENE_WITH_LOADING_PHASE, }
+{ 
+	NONE = -1, 
+	LOADING, 
+	LOADING_WITH_INITIALIZATION, 
+	SCENE1, 
+	SCENE2, 
+	SCENE3, 
+	SCENE_WITH_LOADING_PHASE, 
+}
 
 # [Scene Dictionary]
 var scenes: Dictionary = \
-{"_auto_refresh":false,"_auto_save":false,"_include_list":["res://demo"],"_includes_visible":true,"_scenes":{"loading":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/loading.tscn"},"loading_with_initialization":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/loading_with_initialization.tscn"},"scene1":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/scene1.tscn"},"scene2":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/scene2.tscn"},"scene3":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/scene3.tscn"},"scene_with_loading_phase":{"sections":[],"settings":{"All":{"subsection":"","visibility":true}},"value":"res://demo/scene_with_loading_phase.tscn"}},"_sections":[]}
+{
+	"_auto_refresh": false,
+	"_auto_save": false,
+	"_include_list": [
+		"res://demo"
+	],
+	"_includes_visible": true,
+	"_scenes": {
+		"loading": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/loading.tscn"
+		},
+		"loading_with_initialization": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/loading_with_initialization.tscn"
+		},
+		"scene1": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/scene1.tscn"
+		},
+		"scene2": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/scene2.tscn"
+		},
+		"scene3": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/scene3.tscn"
+		},
+		"scene_with_loading_phase": {
+			"sections": [],
+			"settings": {
+				"All": {
+					"subsection": "",
+					"visibility": true
+				}
+			},
+			"value": "res://demo/scene_with_loading_phase.tscn"
+		}
+	},
+	"_sections": []
+}
+# [End Scene Dictionary]

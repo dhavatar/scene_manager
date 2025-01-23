@@ -18,6 +18,7 @@ const SCENE_DATA_HEADER: String = "#\n\
 extends Node\n\n"
 const SCENE_DATA_ENUM: String = "# [Scene Enum]"
 const SCENE_DATA_DICTIONARY: String = "# [Scene Dictionary]"
+const SCENE_DATA_END_DICTIONARY: String = "# [End Scene Dictionary]"
 
 # scene item, include item
 const SCENE_INCLUDE_ITEM = preload("res://addons/scene_manager/editor/deletable_item.tscn")
@@ -498,23 +499,24 @@ func _save_all() -> void:
 
 	# Convert the keys of the dictionary into an enum
 	write_data += SCENE_DATA_ENUM + "\n"
-	write_data += "enum SceneName \\\n{ NONE = -1, "
+	write_data += "enum SceneName \\\n{ \n\tNONE = -1, "
 
 	# Keep track of invalid enums so there aren't blank names that make the generated enum invalid
 	var invalid_name := "INVALID"
 	var num_invalid: int = 0
 	for key: String in data[SceneManagerConstants.SCENE_DATA_KEY].keys():
 		if key == "":
-			write_data += "%s%d, " % [invalid_name, num_invalid]
+			write_data += "\n\t%s%d, " % [invalid_name, num_invalid]
 			num_invalid += 1
 		else:
-			write_data += "%s, " % key.to_upper()
+			write_data += "\n\t%s, " % key.to_upper()
 	
-	write_data += "}\n\n"
+	write_data += "\n}\n\n"
 
 	write_data += SCENE_DATA_DICTIONARY + "\n"
 	write_data += "var scenes: Dictionary = \\\n"
-	write_data += JSON.new().stringify(data) + "\n"
+	write_data += JSON.new().stringify(data, "\t") + "\n"
+	write_data += SCENE_DATA_END_DICTIONARY + "\n"
 
 	file.store_string(write_data)
 
@@ -525,18 +527,23 @@ func _load_all() -> Dictionary:
 
 	if FileAccess.file_exists(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)):
 		var file := FileAccess.open(ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES), FileAccess.READ)
-
+		var dictionary := "";
+		var in_dictionary := false
 		while not file.eof_reached():
 			var line := file.get_line()
-			if line == SCENE_DATA_DICTIONARY:
-				file.get_line() # Skip the variable declaration
-				line = file.get_line().strip_escapes()
+			if line == SCENE_DATA_END_DICTIONARY:
+				in_dictionary = false
+			elif line == SCENE_DATA_DICTIONARY:
+				in_dictionary = true
+				file.get_line() #skip to json
+			elif in_dictionary:
+				dictionary += line.strip_escapes()
 
-				var json = JSON.new()
-				var err = json.parse(line)
-				assert (err == OK, "Scene Manager Error: `scenes.gd` File is corrupted.")
-				data = json.data
-	
+		var json = JSON.new()
+		var err = json.parse(dictionary)
+		assert (err == OK, "Scene Manager Error: `scenes.gd` File is corrupted.")
+		data = json.data
+
 	return data
 
 
