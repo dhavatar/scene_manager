@@ -34,7 +34,6 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 @onready var _save_button: Button = self.find_child("save")
 @onready var _refresh_button: Button = self.find_child("refresh")
 @onready var _auto_save_button: Button = self.find_child("auto_save")
-@onready var _auto_refresh_button: Button = self.find_child("auto_refresh")
 # add list
 @onready var _add_subsection_button: Button = self.find_child("add_subsection")
 @onready var _add_section_button: Button = self.find_child("add_section")
@@ -57,7 +56,6 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 var _sections: Dictionary = {}
 var reserved_keys: Array = ["none"]
 var _autosave_timer: Timer = null ## Timer for autosave when the key changes
-var _just_saved_timer: Timer = null ## Keep track of if the file just changed to prevent the tab from reloading when unnecessary
 
 # UI signal callbacks
 signal include_child_deleted(node: Node, address: String)
@@ -74,7 +72,6 @@ signal added_to_sub_section(node: Node, sub_section: Node)
 func _ready() -> void:
 	_on_refresh_button_up()
 	
-	EditorInterface.get_resource_filesystem().filesystem_changed.connect(_filesystem_changed)
 	self.include_child_deleted.connect(_on_include_child_deleted)
 	self.item_renamed.connect(_on_item_renamed)
 	self.item_visibility_changed.connect(_on_item_visibility_changed)
@@ -91,11 +88,6 @@ func _ready() -> void:
 	add_child(_autosave_timer)
 	_autosave_timer.timeout.connect(_on_timer_timeout)
 
-	# Create a Timer for keeping track of when the scenes was just saved
-	_just_saved_timer = Timer.new()
-	_just_saved_timer.wait_time = 0.5
-	_just_saved_timer.one_shot = true
-	add_child(_just_saved_timer)
 
 #region Signal Callbacks
 
@@ -145,20 +137,6 @@ func _on_include_child_deleted(node: Node, address: String) -> void:
 
 	_on_data_changed()
 	call_deferred("_on_refresh_button_up")
-
-
-# Gets called by filesystem changes
-func _filesystem_changed() -> void:
-	if Engine.is_editor_hint() and is_inside_tree():
-		# If the timer is active, then the scene.gd was just generated from saving
-		# and there's no actual scene change in the filesystem.
-		if not _just_saved_timer.is_stopped():
-			return
-		
-		if _auto_refresh_button.get_meta("enabled", true):
-			_on_refresh_button_up()
-			await get_tree().process_frame
-			_on_data_changed()
 
 
 # Returns absolute current working directory
@@ -371,7 +349,6 @@ func _reload_ui_scenes() -> void:
 	for key in scenes_data:
 		var scene = scenes_data[key]
 		if key == "_auto_refresh":
-			_change_auto_refresh_state(scene)
 			continue
 		
 		if key == "_auto_save":
@@ -541,10 +518,6 @@ func _save_all() -> void:
 
 	file.store_string(write_data)
 
-	# Set the timer so the file system doesn't reload everything on save.
-	_just_saved_timer.wait_time = 0.5
-	_just_saved_timer.start()
-
 
 # Returns all data in `scenes` variable of `scenes.gd` file
 func _load_all() -> Dictionary:
@@ -634,7 +607,7 @@ func _create_save_dic() -> Dictionary:
 	var data: Dictionary = {}
 	data["_include_list"] = _get_includes_in_include_ui()
 	data["_sections"] = get_all_lists_names_except(["All"])
-	data["_auto_refresh"] = _auto_refresh_button.get_meta("enabled", false)
+	data["_auto_refresh"] = false
 	data["_auto_save"] = _auto_save_button.get_meta("enabled", false)
 	data["_includes_visible"] = _include_container.visible
 	data[SceneManagerConstants.SCENE_DATA_KEY] = _get_scenes_from_ui()
@@ -793,24 +766,9 @@ func _change_auto_save_state(value: bool) -> void:
 	else:
 		_auto_save_button.set_meta("enabled", true)
 		_auto_save_button.icon = ICON_HIDE_BUTTON_CHECKED
-	_save_button.disabled = _auto_refresh_button.get_meta("enabled", true) and _auto_save_button.get_meta("enabled", true)
+	_save_button.disabled = _auto_save_button.get_meta("enabled", true)
 
 
 func _on_auto_save_button_up():
 	_change_auto_save_state(!_auto_save_button.get_meta("enabled", false))
-	_save_all()
-
-
-func _change_auto_refresh_state(value: bool) -> void:
-	if !value:
-		_auto_refresh_button.set_meta("enabled", false)
-		_auto_refresh_button.icon = ICON_FOLDER_BUTTON_UNCHECKED
-	else:
-		_auto_refresh_button.set_meta("enabled", true)
-		_auto_refresh_button.icon = ICON_FOLDER_BUTTON_CHECKED
-	_save_button.disabled = _auto_refresh_button.get_meta("enabled", true) and _auto_save_button.get_meta("enabled", true)
-
-
-func _on_auto_refresh_button_up():
-	_change_auto_refresh_state(!_auto_refresh_button.get_meta("enabled", true))
 	_save_all()
