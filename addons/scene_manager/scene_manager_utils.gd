@@ -44,21 +44,3 @@ static func normalize_key_string(text: String) -> String:
 	
 	text = text.replace(" ", "_")
 	return text
-
-
-## Returns true if the two dictionaries passed in are equal to each other.
-static func dictionary_equal(lh: Dictionary, rh: Dictionary) -> bool:
-	if lh == rh:
-		return true
-	
-	for key in lh:
-		if not rh.has(key):
-			return false
-		var tv = lh[key]
-		if typeof(tv) == TYPE_DICTIONARY:
-			if not dictionary_equal(tv, rh[key]):
-				return false
-		elif tv != rh[key]:
-			return false
-	
-	return true

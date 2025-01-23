@@ -25,6 +25,7 @@ var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of 
 var _load_progress: Array = []
 var _recorded_scene: Scenes.SceneName = Scenes.SceneName.NONE
 var _loaded_scene_map: Dictionary = {} ## Keeps track of all loaded scenes (SceneName key) and the node they belong to in an array (parent node: Node, scene node: Node)
+var _data: SceneManagerData = SceneManagerData.new()
 
 signal load_finished
 signal load_percent_changed(value: int)
@@ -48,6 +49,7 @@ class SceneLoadOptions:
 func _ready() -> void:
 	set_process(false)
 	
+	_data.load()
 	var scene_file_path: String = get_tree().current_scene.scene_file_path
 	_current_scene = _get_scene_key_by_value(scene_file_path)
 
@@ -161,8 +163,8 @@ func _back() -> bool:
 
 # Returns the scene key of the passed scene value (scene address)
 func _get_scene_key_by_value(path: String) -> Scenes.SceneName:
-	for key in Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY]:
-		if Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"] == path:
+	for key in _data.scenes:
+		if _data.scenes[key]["value"] == path:
 			# Convert the string into an enum
 			return SceneManagerUtils.get_enum_from_string(key)
 			
@@ -174,9 +176,9 @@ func _get_scene_value(scene: Scenes.SceneName) -> String:
 	# The enums are normalized to have all caps, but the keys in the scenes may not have that,
 	# do a string comparison with everything normalized.
 	var scene_name: String = SceneManagerUtils.get_string_from_enum(scene)
-	for key in Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY]:
+	for key in _data.scenes:
 		if scene_name == SceneManagerUtils.normalize_enum_string(key):
-			return Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"]
+			return _data.scenes[key]["value"]
 	
 	return ""
 
@@ -263,7 +265,7 @@ func create_scene_instance(key: Scenes.SceneName, use_sub_threads = false) -> No
 ## https://github.com/godotengine/godot/issues/85255[br]
 ## https://github.com/godotengine/godot/issues/84012
 func get_scene(key: Scenes.SceneName, use_sub_threads = false) -> PackedScene:
-	var address = Scenes.scenes[SceneManagerConstants.SCENE_DATA_KEY][key]["value"]
+	var address = _data.scenes[key]["value"]
 	ResourceLoader.load_threaded_request(address, "", use_sub_threads, ResourceLoader.CACHE_MODE_REUSE)
 	return ResourceLoader.load_threaded_get(address)
 
