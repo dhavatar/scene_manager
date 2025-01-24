@@ -27,6 +27,8 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 # add include
 @onready var _address_line_edit: LineEdit = self.find_child("address")
 @onready var _file_dialog: FileDialog = self.find_child("file_dialog")
+@onready var _hide_button: Button = self.find_child("hide")
+@onready var _hide_unhide_button: Button = self.find_child("hide_unhide")
 @onready var _add_button: Button = self.find_child("add")
 # containers
 @onready var _tab_container: TabContainer = self.find_child("tab_container")
@@ -383,6 +385,28 @@ func _on_section_name_text_changed(new_text):
 		_add_section_button.disabled = false
 	else:
 		_add_section_button.disabled = true
+
+
+func _hide_unhide_includes_list(value: bool) -> void:
+	if value:
+		_hide_button.icon = ICON_HIDE_BUTTON_CHECKED
+		_hide_unhide_button.icon = ICON_HIDE_BUTTON_CHECKED
+		_include_container.visible = true
+		_include_panel_container.visible = true
+		_hide_unhide_button.visible = false
+	else:
+		_hide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
+		_hide_unhide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
+		_include_container.visible = false
+		_include_panel_container.visible = false
+		_hide_unhide_button.visible = true
+
+
+# Hide Button
+func _on_hide_button_up():
+	_data.includes_visible = not _data.includes_visible
+	_hide_unhide_includes_list(_data.includes_visible)
+	_on_data_changed()
 
 
 # Tab changes
