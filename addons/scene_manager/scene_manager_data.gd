@@ -74,13 +74,13 @@ var sections: Array:
 
 ## Adds the include path to the data, which is where the scene manager will look for scenes.
 func add_include_path(path: String) -> void:
-	_data[INCLUDES_VISIBLE_KEY].append(path)
+	includes.append(path)
 	_refresh_scenes()
 
 
 ## Removes the include from the data to exclude it from the scene manager search path.
 func remove_include_path(path: String) -> void:
-	_data[INCLUDES_VISIBLE_KEY].erase(path)
+	includes.erase(path)
 	_remove_scenes(path)
 
 
@@ -266,7 +266,7 @@ func _get_included_scenes() -> Dictionary:
 	# If it's a file, add the file directly.
 	var files: Dictionary = {}
 
-	for include_dir: String in _data[INCLUDE_LIST_KEY]:
+	for include_dir: String in includes:
 		var dir := DirAccess.open(include_dir)
 		if not dir: # If it's a file
 			if not FileAccess.file_exists(include_dir):
@@ -358,7 +358,7 @@ func _refresh_scenes() -> void:
 	for address in scenes_to_add:
 		var new_data := {
 			"sections": [],
-			"settings": default_setting,
+			"settings": { "All": default_setting },
 			"value": address
 		}
 
