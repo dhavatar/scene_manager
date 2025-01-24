@@ -142,10 +142,11 @@ func add_scene_to_section(scene_address: String, section_name: String) -> void:
 	if not section_name in _sections[scene_address]:
 		_sections[scene_address].append(section_name)
 
-	# Locate the scene in the data and also update it there
+	# Locate the scene in the data and also update it there if it's not already added
 	for key in scenes:
 		if scenes[key]["value"] == scene_address:
-			scenes[key]["sections"].append(section_name)
+			if section_name not in scenes[key]["sections"]:
+				scenes[key]["sections"].append(section_name)
 			break
 
 
@@ -160,10 +161,11 @@ func remove_scene_from_section(scene_address: String, section_name: String) -> v
 	if _sections[scene_address].is_empty():
 		_sections.erase(scene_address)
 	
-	# Locate the scene in the data and also update it there
+	# Locate the scene in the data and also update it there if it's not already added
 	for key in scenes:
 		if scenes[key]["value"] == scene_address:
-			scenes[key]["sections"].erase(section_name)
+			if section_name not in scenes[key]["sections"]:
+				scenes[key]["sections"].erase(section_name)
 			break
 
 
@@ -226,6 +228,12 @@ func save() -> void:
 func load() -> void:
 	_data = _load_file()
 	_file_data = _data.duplicate(true)
+
+	# Create the section cache based on the scene data
+	_sections.clear()
+	for key in scenes:
+		for section in scenes[key]["sections"]:
+			add_scene_to_section(scenes[key]["value"], section)
 
 
 # Internal function for loading the data from the `scene.gd` file.

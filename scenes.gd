@@ -33,15 +33,21 @@ var scenes: Dictionary = \
 			"value": "res://demo/loading_with_initialization.tscn"
 		},
 		"scene1": {
-			"sections": [],
+			"sections": [
+				"Level"
+			],
 			"value": "res://demo/scene1.tscn"
 		},
 		"scene2": {
-			"sections": [],
+			"sections": [
+				"Level"
+			],
 			"value": "res://demo/scene2.tscn"
 		},
 		"scene3": {
-			"sections": [],
+			"sections": [
+				"Level"
+			],
 			"value": "res://demo/scene3.tscn"
 		},
 		"scene_with_loading_phase": {
@@ -49,6 +55,8 @@ var scenes: Dictionary = \
 			"value": "res://demo/scene_with_loading_phase.tscn"
 		}
 	},
-	"_sections": []
+	"_sections": [
+		"Level"
+	]
 }
 # [End Scene Dictionary]

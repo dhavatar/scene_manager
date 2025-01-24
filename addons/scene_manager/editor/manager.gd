@@ -314,6 +314,7 @@ func check_duplication():
 # Save button
 func _on_save_button_up():
 	_data.save()
+	_refresh_save_changes()
 
 
 # Returns array of include nodes from UI view
