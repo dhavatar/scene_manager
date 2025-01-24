@@ -2,7 +2,6 @@ extends Node
 ## Main SceneManager that handles adding scenes and transitions.
 
 const FADE: String = "fade"
-const DEFAULT_FADE_TIME: float = 1.0
 const DEFAULT_TREE_NODE_NAME: String = "World" ## Default node name to be used for loading scenes
 const _MAP_PARENT_INDEX: int = 0 # Index to the loaded scene map for the parent node
 const _MAP_SCENE_INDEX: int = 1 # Index to the loaded scene map for the scene node
@@ -40,8 +39,8 @@ signal fade_out_finished
 class SceneLoadOptions:
 	var node_name: String = DEFAULT_TREE_NODE_NAME ## Where in the node structure the new scene will load.
 	var mode: SceneLoadingMode = SceneLoadingMode.SINGLE ## Whether to only have a single scene or an additive load. Defaults to SINGLE.
-	var fade_out_time: float = DEFAULT_FADE_TIME
-	var fade_in_time: float = DEFAULT_FADE_TIME
+	var fade_out_time: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_OUT_TIME)
+	var fade_in_time: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_IN_TIME)
 	var clickable: bool = true ## Whether or not to block mouse input during the scene load. Defaults to true.
 	var add_to_back: bool = true ## Whether or not to add the scene onto the stack so the scene can go back to it.
 
@@ -225,8 +224,8 @@ func create_load_options(
 		node: String = DEFAULT_TREE_NODE_NAME,
 		mode: SceneLoadingMode = SceneLoadingMode.SINGLE,
 		clickable: bool = true,
-		fade_out_time: float = DEFAULT_FADE_TIME,
-		fade_in_time: float = DEFAULT_FADE_TIME,
+		fade_out_time: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_OUT_TIME),
+		fade_in_time: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_IN_TIME),
 		add_to_back: bool = true) -> SceneLoadOptions:
 	var options: SceneLoadOptions = SceneLoadOptions.new()
 	options.node_name = node

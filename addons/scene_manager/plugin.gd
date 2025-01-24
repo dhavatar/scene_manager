@@ -4,23 +4,44 @@ extends EditorPlugin
 var _menu: Node
 var _plugin: Object
 
-const SETTINGS_PROPERTY_NAME := "scene_manager/scenes/scenes_path"
-
 
 func set_properties_for_setting():
-	var property_info = {
-		"name": SETTINGS_PROPERTY_NAME,
+	ProjectSettings.add_property_info({
+		"name": SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME,
 		"type": TYPE_STRING,
 		"hint": PROPERTY_HINT_FILE,
 		"hint_string": "scenes.gd"
-	}
-	ProjectSettings.add_property_info(property_info)
+	})
 	
-	ProjectSettings.set_initial_value(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
-	ProjectSettings.set_as_basic(SETTINGS_PROPERTY_NAME, true)
+	ProjectSettings.add_property_info({
+		"name": SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME,
+		"type": TYPE_FLOAT,
+	})
+
+	ProjectSettings.add_property_info({
+		"name": SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME,
+		"type": TYPE_FLOAT,
+	})
+
+	ProjectSettings.add_property_info({
+		"name": SceneManagerConstants.SETTINGS_AUTO_SAVE_PROPERTY_NAME,
+		"type": TYPE_BOOL,
+	})
+
+	ProjectSettings.set_initial_value(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
+	ProjectSettings.set_as_basic(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME, true)
 	
+	ProjectSettings.set_initial_value(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_OUT_TIME)
+	ProjectSettings.set_as_basic(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, true)
+
+	ProjectSettings.set_initial_value(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_IN_TIME)
+	ProjectSettings.set_as_basic(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, true)
+
+	ProjectSettings.set_initial_value(SceneManagerConstants.SETTINGS_AUTO_SAVE_PROPERTY_NAME, false)
+	ProjectSettings.set_as_internal(SceneManagerConstants.SETTINGS_AUTO_SAVE_PROPERTY_NAME, true)
+
 	# Restart is required as path to Scenes singleton has changed
-	ProjectSettings.set_restart_if_changed(SETTINGS_PROPERTY_NAME, true)
+	ProjectSettings.set_restart_if_changed(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME, true)
 	
 	ProjectSettings.save()
 
@@ -28,8 +49,17 @@ func set_properties_for_setting():
 # Plugin installation
 func _enter_tree():
 	# Adding settings property to Project/Settings & loading
-	if !ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
-		ProjectSettings.set_setting(SETTINGS_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
+	if !ProjectSettings.has_setting(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME):
+		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME, SceneManagerConstants.DEFAULT_PATH_TO_SCENES)
+	
+	if !ProjectSettings.has_setting(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME):
+		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_OUT_TIME)
+
+	if !ProjectSettings.has_setting(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME):
+		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_IN_TIME)
+	
+	if !ProjectSettings.has_setting(SceneManagerConstants.SETTINGS_AUTO_SAVE_PROPERTY_NAME):
+		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_AUTO_SAVE_PROPERTY_NAME, false)
 	
 	set_properties_for_setting()
 
@@ -54,7 +84,7 @@ func _exit_tree():
 	#
 	# So... not a good idea to use this:
 	#
-	# ProjectSettings.clear(SETTINGS_PROPERTY_NAME)
+	# ProjectSettings.clear(SCENE_SETTINGS_PROPERTY_NAME)
 	#
 	# We just don't remove the settings for now
 	remove_custom_type("Auto Complete Assistant")
@@ -66,8 +96,8 @@ func _exit_tree():
 
 func _enable_plugin():
 	var path_to_scenes = SceneManagerConstants.DEFAULT_PATH_TO_SCENES
-	if ProjectSettings.has_setting(SETTINGS_PROPERTY_NAME):
-		path_to_scenes = ProjectSettings.get_setting(SETTINGS_PROPERTY_NAME)
+	if ProjectSettings.has_setting(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME):
+		path_to_scenes = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_SCENE_PROPERTY_NAME)
 	
 	add_autoload_singleton("SceneManager", "res://addons/scene_manager/scene_manager.tscn")
 	add_autoload_singleton("Scenes", path_to_scenes)

@@ -20,12 +20,9 @@ enum SceneName \
 # [Scene Dictionary]
 var scenes: Dictionary = \
 {
-	"_auto_refresh": false,
-	"_auto_save": false,
 	"_include_list": [
 		"res://demo"
 	],
-	"_includes_visible": true,
 	"_scenes": {
 		"loading": {
 			"sections": [],
