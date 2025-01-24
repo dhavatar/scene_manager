@@ -12,25 +12,41 @@ const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 
 var _root: Node = self
 var _is_closable: bool = true
-var _header_visible: bool = false
+var _header_visible: bool = true
 
 
-# If it is "All" subsection, open it
 func _ready() -> void:
 	_button_header.text = name
 	_button_header.visible = _header_visible
 	visible = true
 
 
-# Add child
+## Add child to the sub section list
 func add_item(item: Node) -> void:
 	item._sub_section = self
 	_list.add_child(item)
 
 
-# Removes an item from list
+## Removes an item from sub section list
 func remove_item(item: Node) -> void:
+	item._sub_section = null
 	_list.remove_child(item)
+
+
+## Retrieves an item from the sub section list that matches the key.[br]
+## Returns null if the item isn't found.[br]
+## The node returned is a scene_item.
+func get_item(key: String) -> Node:
+	for child in _list.get_children():
+		if child.get_key() == key:
+			return child
+	
+	return null
+
+
+## Retrieves the raw list container.
+func get_list_container() -> VBoxContainer:
+	return _list
 
 
 # Open list
@@ -83,14 +99,14 @@ func child_exited():
 	_check_count()
 
 
-# Hides delete button of subsection
-func hide_delete_button():
-	_delete_button.visible = false
-
-
 ## Enables/disables the delete button for deleting the sub section.
 func enable_delete_button(enable: bool) -> void:
 	_delete_button.disabled = not enable
+
+
+## Sets whether or not to make the delete button visible.
+func set_delete_visible(visible: bool) -> void:
+	_delete_button.visible = visible
 
 
 ## Sets whether or not the subsection can close.

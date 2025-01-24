@@ -15,6 +15,8 @@ const ICON_HIDE_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/Gui
 const ICON_FOLDER_BUTTON_CHECKED = preload("res://addons/scene_manager/icons/FolderActive.svg")
 const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/Folder.svg")
 
+const ALL_LIST_NAME := "All" ## Default list that contains all scenes
+
 # UI nodes and items
 @onready var _include_list: Node = self.find_child("include_list")
 # add save, refresh
@@ -41,7 +43,6 @@ var _autosave_timer: Timer = null ## Timer for autosave when the key changes
 # UI signal callbacks
 signal include_child_deleted(node: Node, address: String)
 signal item_renamed(node: Node, previous_name: String, new_name: String)
-signal item_visibility_changed(node: Node, visibility: bool)
 signal item_added_to_list(node: Node, list_name: String)
 signal item_removed_from_list(node: Node, list_name: String)
 signal section_removed(node: Node, section_name: String)
@@ -56,7 +57,6 @@ func _ready() -> void:
 
 	self.include_child_deleted.connect(_on_include_child_deleted)
 	self.item_renamed.connect(_on_item_renamed)
-	self.item_visibility_changed.connect(_on_item_visibility_changed)
 	self.item_added_to_list.connect(_on_added_to_list)
 	self.item_removed_from_list.connect(_on_item_removed_from_list)
 	self.section_removed.connect(_on_section_removed)
@@ -78,6 +78,11 @@ func _on_data_changed() -> void:
 
 func _on_section_removed(node: Node, section_name: String) -> void:
 	_data.remove_section(section_name)
+
+	# Loop through the scenes and update the categorized for the "All" list
+	for scene in _data.scenes:
+		_update_categorized(scene)
+	
 	_on_data_changed()
 
 
@@ -94,17 +99,15 @@ func _on_item_renamed(node: Node, previous_name: String, new_name: String) -> vo
 		_autosave_timer.start()
 
 
-func _on_item_visibility_changed(node: Node, visibility: bool) -> void:	
-	_on_data_changed()
-
-
 func _on_added_to_list(node: Node, list_name: String) -> void:
 	_data.add_scene_to_section(node.get_value(), list_name)
+	_update_categorized(node.get_key())
 	_on_data_changed()
 
 
 func _on_item_removed_from_list(node: Node, list_name: String) -> void:
 	_data.remove_scene_from_section(node.get_value(), list_name)
+	_update_categorized(node.get_key())
 	_on_data_changed()
 
 
@@ -187,7 +190,16 @@ func _rename_scene_in_lists(key: String, new_key: String) -> void:
 		list_node.sort_scenes()
 
 
-# Removes a scene from a specific list
+# Updates the categorized/uncategorized sub section in the "All" list for the scene.
+func _update_categorized(key: String) -> void:
+	# Get the scene information from the data
+	var categorized := _data.has_sections(_data.scenes[key]["value"])
+
+	var list: Node = _get_scene_list_node_by_name(ALL_LIST_NAME)
+	list.update_item_categorized(key, categorized)
+
+
+## Removes a scene from a specific list.
 func remove_scene_from_list(section_name: String, scene_name: String, scene_address: String) -> void:
 	var list: Node = _get_scene_list_node_by_name(section_name)
 	list.remove_item(scene_name, scene_address)
@@ -198,11 +210,11 @@ func remove_scene_from_list(section_name: String, scene_name: String, scene_addr
 ## This function is used in `scene_item.gd` script and plus doing what it is supposed
 ## to do, removes and again adds the item in `All` section so that it can be placed
 ## in correct place in correct section.
-func add_scene_to_list(list_name: String, scene_name: String, scene_address: String) -> void:
+func add_scene_to_list(list_name: String, scene_name: String, scene_address: String, categorized: bool = false) -> void:
 	var list: Node = _get_scene_list_node_by_name(list_name)
 	if list == null:
 		return
-	await list.add_item(scene_name, scene_address)
+	await list.add_item(scene_name, scene_address, categorized)
 
 
 # Adds an address to the include list
@@ -237,9 +249,9 @@ func _reload_ui_scenes() -> void:
 	for key in _data.scenes:
 		var scene = _data.scenes[key]
 		for section in scene["sections"]:
-			add_scene_to_list(section, key, scene["value"])
+			add_scene_to_list(section, key, scene["value"], true)
 		
-		add_scene_to_list("All", key, scene["value"])
+		add_scene_to_list(ALL_LIST_NAME, key, scene["value"], _data.has_sections(scene["value"]))
 
 	_sort_scenes_in_lists()
 
@@ -253,8 +265,8 @@ func _reload_ui_includes() -> void:
 
 # Reloads tabs in UI
 func _reload_ui_tabs() -> void:
-	if _get_scene_list_node_by_name("All") == null:
-		_add_scene_ui_list("All")
+	if _get_scene_list_node_by_name(ALL_LIST_NAME) == null:
+		_add_scene_ui_list(ALL_LIST_NAME)
 	for section in _data.sections:
 		var found = false
 		for list in _get_lists_nodes():
@@ -283,7 +295,7 @@ func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: 
 
 ## Checks for duplications in scenes of lists
 func check_duplication():
-	var list: Array = _get_scene_list_node_by_name("All").check_duplication()
+	var list: Array = _get_scene_list_node_by_name(ALL_LIST_NAME).check_duplication()
 	for node in _get_lists_nodes():
 		node.set_reset_theme_for_all()
 		if list:

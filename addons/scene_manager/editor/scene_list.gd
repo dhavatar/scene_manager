@@ -1,19 +1,19 @@
 @tool
 extends Node
 
-# Scene itema and sub_section to instance and add in list
+# Scene item and sub_section to instance and add in list
 const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 const SUB_SECTION = preload("res://addons/scene_manager/editor/sub_section.tscn")
 # Duplicate/invalid + normal scene theme
 const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
+const ALL_LIST_NAME := "All"
 
-# variables
 @onready var _container: VBoxContainer = find_child("container")
 @onready var _delete_list_button: Button = find_child("delete_list")
 
 var _root: Node = self
-var _main_subsection: Node = null
-var _secondary_subsection: Node = null
+var _main_subsection: Node = null # "All" subsection by default. In the "All" list, this is "Uncategorized" items
+var _secondary_subsection: Node = null # Mainly used for the default "All" list for "Categorized" items
 
 
 # Finds and fills `_root` variable properly
@@ -28,27 +28,43 @@ func _ready() -> void:
 			break
 		_root = _root.get_parent()
 
-	if self.name == "All":
+	if name == ALL_LIST_NAME:
 		_delete_list_button.icon = null
 		_delete_list_button.disabled = true
 		_delete_list_button.visible = false
 		_delete_list_button.focus_mode = Control.FOCUS_NONE
 
-	var sub = SUB_SECTION.instantiate()
-	sub._root = _root
-	sub.name = "All"
-	sub.visible = false
-	_container.add_child(sub)
-	sub.open()
-	sub.hide_delete_button()
-	_main_subsection = sub
+		var sub = SUB_SECTION.instantiate()
+		sub._root = _root
+		sub.name = "Uncategorized"
+		_container.add_child(sub)
+		sub.open()
+		sub.enable_delete_button(false)
+		sub.set_delete_visible(false)
+		_main_subsection = sub
 
-	# Have to deferr the call as the object won't be ready yet at this point
-	sub.call_deferred("set_closable", false if name == "All" else true)
+		var sub2 = SUB_SECTION.instantiate()
+		sub._root = _root
+		sub2.name = "Categorized"
+		_container.add_child(sub2)
+		sub2.enable_delete_button(false)
+		sub2.set_delete_visible(false)
+		_secondary_subsection = sub2
+	else:
+		var sub = SUB_SECTION.instantiate()
+		sub._root = _root
+		sub.name = ALL_LIST_NAME
+		sub.visible = false
+		_container.add_child(sub)
+		sub.open()
+		sub.set_header_visible(false)
+		sub.enable_delete_button(false)
+		sub.set_delete_visible(false)
+		_main_subsection = sub
 
 
 ## Adds an item to list
-func add_item(key: String, value: String) -> void:
+func add_item(key: String, value: String, categorized: bool = false) -> void:
 	if not self.is_node_ready():
 		await self.ready
 	
@@ -56,7 +72,46 @@ func add_item(key: String, value: String) -> void:
 	item.set_key(key)
 	item.set_value(value)
 	item._list = self
-	_main_subsection.add_item(item)
+
+	# For the default All case, determine which sub category it goes into
+	if name == ALL_LIST_NAME and categorized:
+		_secondary_subsection.add_item(item)
+	else:
+		_main_subsection.add_item(item)
+
+
+## Updates whether or not the item is categorized and moves it to the correct subcategory.[br]
+## Used for the default "All" list.
+func update_item_categorized(key: String, categorized: bool) -> void:
+	# Make sure this is the correct list
+	if name != ALL_LIST_NAME:
+		push_warning("Cannot set categorization in a list other than All (attempting to set in %s)" % name)
+		return
+	
+	# Find the item in the sub sections.
+	var item = _main_subsection.get_item(key)
+	if item:
+		# If the item is already not categorized, then nothing needs to be done
+		if not categorized:
+			return
+		
+		# Otherwise, the item should go into the "Categorized"
+		_main_subsection.remove_item(item)
+		_secondary_subsection.add_item(item)
+		_sort_node_list(_secondary_subsection.get_list_container())
+		return
+	
+	item = _secondary_subsection.get_item(key)
+	if item:
+		# If it's already categorized, nothing needs to be done
+		if categorized:
+			return
+		
+		# Otherwise, the item should go into the "Uncategorized"
+		_secondary_subsection.remove_item(item)
+		_main_subsection.add_item(item)
+		_sort_node_list(_main_subsection.get_list_container())
+		return
 
 
 ## Updates the item key with the new key.
@@ -125,7 +180,7 @@ func append_scenes(nodes: Dictionary) -> void:
 func sort_scenes() -> void:
 	for section in _container.get_children():
 		# We want to get the list, which will be the second child in the sub section
-		var list := section.get_child(1)
+		var list = section.get_list_container()
 		_sort_node_list(list)
 
 
