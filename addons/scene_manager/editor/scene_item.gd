@@ -14,11 +14,12 @@ var _setting: ItemSetting
 var _sub_section: Control
 var _list: Control
 var _mouse_is_over_value: bool
-var _previous_value: String
+var _previous_key: String # Used when comparing the user typed key
+
 
 # Finds and fills `_root` variable properly
 func _ready() -> void:
-	_previous_value = _key
+	_previous_key = _key
 	while true:
 		if _root == null:
 			## If we are here, we are running in editor, so get out
@@ -28,67 +29,65 @@ func _ready() -> void:
 		_root = _root.get_parent()
 
 
-# Sets value of `key`
+## Directly set the key. Called by other UI elements when updating as this bypases the text normalization.
 func set_key(text: String) -> void:
-	# Normalize the key to be lower case without symbols and replacing spaces with underscores
-	text = SceneManagerUtils.normalize_key_string(text)
-	get_node("key").text = text
-	name = text
+	_previous_key = text
 	_key = text
+	get_node("key").text = text
 
 
-# Sets value of `value`
+## Sets value of `value`
 func set_value(text: String) -> void:
 	get_node("value").text = text
 
 
-# Return `key` string value
+## Return `key` string value
 func get_key() -> String:
 	return get_node("key").text
 
 
-# Return `value` string value
+## Return `value` string value
 func get_value() -> String:
 	return get_node("value").text
 
 
-# Returns `key` node
+## Returns `key` node
 func get_key_node() -> Node:
 	return get_node("key")
 
 
-# Returns `_setting.visibility` value
+## Returns `_setting.visibility` value
 func get_visibility() -> bool:
 	return _setting.visibility
 
 
-# Sets value of `_setting.visibility`
+## Sets value of `_setting.visibility`
 func set_visibility(input: bool) -> void:
 	_setting.visibility = input
 	self.visible = _list.determine_item_visibility(_setting)
 
 
-# Returns `_setting`
+## Returns `_setting`
 func get_setting() -> ItemSetting:
 	return _setting
 
 
-# Sets `_setting`
+## Sets `_setting`
 func set_setting(setting: ItemSetting) -> void:
 	_setting = setting
 
 
-# Sets subsection for current item
+## Sets subsection for current item
 func set_subsection(node: Control) -> void:
 	_sub_section = node
 
 
-# Sets passed theme to normal theme of `key` LineEdit
+## Sets passed theme to normal theme of `key` LineEdit
 func custom_set_theme(theme: StyleBox) -> void:
 	get_key_node().add_theme_stylebox_override("normal", theme)
 
 
-# Removes added custom theme for `key` LineEdit
+## Removes added custom theme for `key` LineEdit
 func remove_custom_theme() -> void:
 	get_key_node().remove_theme_stylebox_override("normal")
 
@@ -168,6 +167,15 @@ func _on_popup_menu_index_pressed(index: int):
 			_root.item_visibility_changed.emit(self, new_visibility)
 
 
+# Updates the value of `key` when the user is typing it in.
+func _update_key(text: String) -> void:
+	# Normalize the key to be lower case without symbols and replacing spaces with underscores
+	text = SceneManagerUtils.normalize_key_string(text)
+	get_node("key").text = text
+	name = text
+	_key = text
+
+
 # Runs by hand in `_on_key_gui_input` function when text of key LineEdit
 # changes and key event of it was released
 func _on_key_value_text_changed() -> void:
@@ -176,7 +184,7 @@ func _on_key_value_text_changed() -> void:
 
 # Called by the UI when the text changes
 func _on_key_text_changed(new_text: String) -> void:
-	set_key(new_text)
+	_update_key(new_text)
 	_key_edit.caret_column = _key.length()
 
 
@@ -208,9 +216,9 @@ func _on_key_gui_input(event: InputEvent) -> void:
 
 # Emits a signal if the key value is different than it was at the start
 func _submit_key() -> void:
-	if _previous_value != _key:
-		_previous_value = _key
-		_root.item_renamed.emit(self)
+	if _previous_key != _key:
+		_root.item_renamed.emit(self, _previous_key, _key)
+		_previous_key = _key
 
 
 # When added

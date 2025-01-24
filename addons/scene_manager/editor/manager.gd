@@ -41,7 +41,7 @@ var _autosave_timer: Timer = null ## Timer for autosave when the key changes
 
 # UI signal callbacks
 signal include_child_deleted(node: Node, address: String)
-signal item_renamed(node: Node)
+signal item_renamed(node: Node, previous_name: String, new_name: String)
 signal item_visibility_changed(node: Node, visibility: bool)
 signal item_added_to_list(node: Node, list_name: String)
 signal item_removed_from_list(node: Node, list_name: String)
@@ -98,7 +98,10 @@ func _on_timer_timeout() -> void:
 	_on_data_changed()
 
 
-func _on_item_renamed(node: Node) -> void:
+func _on_item_renamed(node: Node, previous_name: String, new_name: String) -> void:
+	_data.change_name(previous_name, new_name)
+	_rename_scene_in_lists(previous_name, new_name)
+	
 	if _data.auto_save:
 		_autosave_timer.wait_time = 0.5
 		_autosave_timer.start()
@@ -159,7 +162,7 @@ func get_all_sublists_names_except(excepts: Array = [""]) -> Array:
 
 # Clears scenes inside a UI list
 func _clear_scenes_list(name: String) -> void:
-	var list: Node = _get_one_list_node_by_name(name)
+	var list: Node = _get_scene_list_node_by_name(name)
 	if list != null:
 		list.clear_list()
 
@@ -183,16 +186,29 @@ func _get_lists_nodes() -> Array:
 
 # Returns node of a specific list in UI.
 # Note that the Node is part of `scene_list.gd` and has access to those functions.
-func _get_one_list_node_by_name(name: String) -> Node:
+func _get_scene_list_node_by_name(name: String) -> Node:
 	for node in _get_lists_nodes():
 		if name.capitalize() == node.name:
 			return node
 	return null
 
 
+# Sorts all the lists in the UI based on the key name.
+func _sort_scenes_in_lists() -> void:
+	for list_node in _get_lists_nodes():
+		list_node.sort_scenes()
+
+
+# Renames a scene in all the lists.
+func _rename_scene_in_lists(key: String, new_key: String) -> void:
+	for list_node in _get_lists_nodes():
+		list_node.update_item_key(key, new_key)
+		list_node.sort_scenes()
+
+
 # Removes a scene from a specific list
 func remove_scene_from_list(section_name: String, scene_name: String, scene_address: String) -> void:
-	var list: Node = _get_one_list_node_by_name(section_name)
+	var list: Node = _get_scene_list_node_by_name(section_name)
 	list.remove_item(scene_name, scene_address)
 
 
@@ -202,7 +218,7 @@ func remove_scene_from_list(section_name: String, scene_name: String, scene_addr
 ## to do, removes and again adds the item in `All` section so that it can be placed
 ## in correct place in correct section.
 func add_scene_to_list(list_name: String, scene_name: String, scene_address: String, setting: ItemSetting) -> void:
-	var list: Node = _get_one_list_node_by_name(list_name)
+	var list: Node = _get_scene_list_node_by_name(list_name)
 	if list == null:
 		return
 	await list.add_item(scene_name, scene_address, setting)
@@ -246,6 +262,8 @@ func _reload_ui_scenes() -> void:
 		var all_settings := ItemSetting.dictionary_to_item_setting(scene["settings"]["All"])
 		add_scene_to_list("All", key, scene["value"], all_settings)
 
+	_sort_scenes_in_lists()
+
 
 # Reloads include list in UI
 func _reload_ui_includes() -> void:
@@ -256,7 +274,7 @@ func _reload_ui_includes() -> void:
 
 # Reloads tabs in UI
 func _reload_ui_tabs() -> void:
-	if _get_one_list_node_by_name("All") == null:
+	if _get_scene_list_node_by_name("All") == null:
 		_add_scene_ui_list("All")
 	for section in _data.sections:
 		var found = false
@@ -286,7 +304,7 @@ func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: 
 
 ## Checks for duplications in scenes of lists
 func check_duplication():
-	var list: Array = _get_one_list_node_by_name("All").check_duplication()
+	var list: Array = _get_scene_list_node_by_name("All").check_duplication()
 	for node in _get_lists_nodes():
 		node.set_reset_theme_for_all()
 		if list:

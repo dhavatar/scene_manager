@@ -84,7 +84,29 @@ func remove_include_path(path: String) -> void:
 	_remove_scenes(path)
 
 
+## Adds the scene to the specified subsection.
+func add_to_subsection(scene_address: String, section_name: String, sub_section: String) -> void:
+	for key in scenes:
+		if scenes[key]["value"] == scene_address:
+			scenes[key]["settings"][section_name]["subsection"] = sub_section
+			break
+
+
+## Removes the scene from the specified subsection.
+func remove_from_subsection(scene_address: String, section_name: String, sub_section: String) -> void:
+	for key in scenes:
+		if scenes[key]["value"] == scene_address:
+			scenes[key]["settings"][section_name]["subsection"] = ""
+			break
+
+
+## Changes the scene key name in the data
+func change_name(old_scene_name: String, new_scene_name: String) -> void:
+	scenes[new_scene_name] = scenes[old_scene_name]
+	scenes.erase(old_scene_name)
+
 #region Section Handler
+
 
 ## Adds a new section
 func add_section(section_name: String) -> void:
