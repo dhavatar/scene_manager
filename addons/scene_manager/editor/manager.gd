@@ -74,6 +74,9 @@ func _ready() -> void:
 func _on_data_changed() -> void:
 	if _data.auto_save:
 		_data.save()
+	
+	# Update the lists to show "unsaved changes" if there's any changes from the scene file.
+	_refresh_save_changes()
 
 
 func _on_section_removed(node: Node, section_name: String) -> void:
@@ -272,8 +275,14 @@ func _reload_ui_tabs() -> void:
 		for list in _get_lists_nodes():
 			if list.name == section:
 				found = true
-		if !found:
+		if not found:
 			_add_scene_ui_list(section)
+
+
+# Loops through the UI lists and updates them with the "unsaved changes" visibility if the data has changed.
+func _refresh_save_changes() -> void:
+	for list in _get_lists_nodes():
+		list.set_changes_unsaved(_data.has_changes)
 
 
 # Refresh button

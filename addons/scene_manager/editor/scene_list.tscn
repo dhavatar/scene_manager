@@ -23,6 +23,12 @@ icon = ExtResource("3")
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 
+[node name="save_label" type="Label" parent="_title"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Unsaved changes*"
+horizontal_alignment = 2
+
 [node name="scenes" type="ScrollContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3

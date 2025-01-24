@@ -10,6 +10,7 @@ const ALL_LIST_NAME := "All"
 
 @onready var _container: VBoxContainer = find_child("container")
 @onready var _delete_list_button: Button = find_child("delete_list")
+@onready var _save_label: Label = find_child("save_label")
 
 var _root: Node = self
 var _main_subsection: Node = null # "All" subsection by default. In the "All" list, this is "Uncategorized" items
@@ -61,6 +62,8 @@ func _ready() -> void:
 		sub.enable_delete_button(false)
 		sub.set_delete_visible(false)
 		_main_subsection = sub
+	
+	_save_label.visible = false
 
 
 ## Adds an item to list
@@ -267,6 +270,11 @@ func set_duplicate_theme(list: Array) -> void:
 		for j in range(len(children)):
 			if children[j].get_key() in list:
 				children[j].custom_set_theme(DUPLICATE_LINE_EDIT)
+
+
+## Sets whether or not to display there's unsaved changes.
+func set_changes_unsaved(changes: bool) -> void:
+	_save_label.visible = changes
 
 
 ## Returns all names of sublist

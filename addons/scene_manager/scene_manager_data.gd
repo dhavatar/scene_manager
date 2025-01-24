@@ -32,11 +32,12 @@ const SCENE_DATA_END_DICTIONARY: String = "# [End Scene Dictionary]"
 # Example: { "res://demo/scene3.tscn": ["Character", "Menu"] }
 var _sections: Dictionary = {}
 var _data: Dictionary = {} # Main data storage for all settings
+var _file_data: Dictionary = {} # Current data in the file to use when comparing against the data
 
 
 #region Accessors to the dictionary data
 
-# Whether or not the editor plugin will auto save.
+## Whether or not the editor plugin will auto save.
 var auto_save: bool:
 	get:
 		return _data[AUTO_SAVE_KEY]
@@ -44,7 +45,7 @@ var auto_save: bool:
 		_data[AUTO_SAVE_KEY] = value
 
 
-# Whether or not the include paths in the editor UI is visible.
+## Whether or not the include paths in the editor UI is visible.
 var includes_visible: bool:
 	get:
 		return _data[INCLUDES_VISIBLE_KEY]
@@ -52,22 +53,28 @@ var includes_visible: bool:
 		_data[INCLUDES_VISIBLE_KEY] = value
 
 
-# Returns the scenes from `scenes` variable of `scenes.gd` file
+## Returns the scenes from `scenes` variable of `scenes.gd` file
 var scenes: Dictionary:
 	get:
 		return _data[SCENE_DATA_KEY]
 
 
-# Returns the array value of `_include_list` key from `scenes` variable of `scenes.gd` file
+## Returns the array value of `_include_list` key from `scenes` variable of `scenes.gd` file
 var includes: Array:
 	get:
 		return _data[INCLUDE_LIST_KEY]
 
 
-# Returns the array value of `_sections` key from `scenes` variable of `scenes.gd` file
+## Returns the array value of `_sections` key from `scenes` variable of `scenes.gd` file
 var sections: Array:
 	get:
 		return _data[SECTIONS_KEY]
+
+
+## Returns true if there's been changes that haven't been saved.
+var has_changes: bool:
+	get:
+		return not _file_data.recursive_equal(_data, 3)
 
 #endregion Accessors
 
@@ -188,9 +195,8 @@ func has_sections(scene_address: String) -> bool:
 
 ## Saves all data to the `scenes.gd` file.
 func save() -> void:
-	# To prevent writing to the file when not necessary, load the file first and compare the dictionary against the current
-	var current_file_data := _load_file()
-	if current_file_data.recursive_equal(_data, 3):
+	# To prevent writing to the file when not necessary, compare the dictionary against the stored file content
+	if not has_changes:
 		# File is the same as the current data, don't do any unneeded file writing
 		return
 
@@ -221,11 +227,13 @@ func save() -> void:
 	write_data += SCENE_DATA_END_DICTIONARY + "\n"
 
 	file.store_string(write_data)
+	_file_data = _data.duplicate(true)
 
 
 ## Loads all data in the `scenes.gd` file.
 func load() -> void:
 	_data = _load_file()
+	_file_data = _data.duplicate(true)
 
 
 # Internal function for loading the data from the `scene.gd` file.
