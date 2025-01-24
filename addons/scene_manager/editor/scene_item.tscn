@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://hh0sw1g7upfc"]
+[gd_scene load_steps=4 format=3 uid="uid://hh0sw1g7upfc"]
 
 [ext_resource type="Script" path="res://addons/scene_manager/editor/scene_item.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://djj6it6ehklel" path="res://addons/scene_manager/icons/GuiTabMenuHl.svg" id="3"]
-[ext_resource type="Script" path="res://addons/scene_manager/editor/popup_button.gd" id="3_nwus0"]
 [ext_resource type="Texture2D" uid="uid://djg8os8ixd00r" path="res://addons/scene_manager/icons/PlayOverlay.png" id="4_pt2e1"]
 
 [node name="item" type="HBoxContainer"]
@@ -15,7 +14,6 @@ script = ExtResource("2")
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 icon = ExtResource("3")
-script = ExtResource("3_nwus0")
 
 [node name="key" type="LineEdit" parent="."]
 layout_mode = 2
@@ -25,6 +23,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 3
 editable = false
+drag_and_drop_selection_enabled = false
 
 [node name="open_button" type="Button" parent="."]
 texture_filter = 1

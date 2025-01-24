@@ -10,7 +10,6 @@ const INVALID_KEY_NAME: String = "none"
 @onready var _key_edit: LineEdit = get_node("key")
 @onready var _key: String = get_node("key").text
 
-var _setting: ItemSetting
 var _sub_section: Control
 var _list: Control
 var _mouse_is_over_value: bool
@@ -56,27 +55,6 @@ func get_key_node() -> Node:
 	return get_node("key")
 
 
-## Returns `_setting.visibility` value
-func get_visibility() -> bool:
-	return _setting.visibility
-
-
-## Sets value of `_setting.visibility`
-func set_visibility(input: bool) -> void:
-	_setting.visibility = input
-	self.visible = _list.determine_item_visibility(_setting)
-
-
-## Returns `_setting`
-func get_setting() -> ItemSetting:
-	return _setting
-
-
-## Sets `_setting`
-func set_setting(setting: ItemSetting) -> void:
-	_setting = setting
-
-
 ## Sets subsection for current item
 func set_subsection(node: Control) -> void:
 	_sub_section = node
@@ -108,15 +86,6 @@ func _on_popup_button_button_up():
 		_popup_menu.set_item_id(i, 0)
 		_popup_menu.set_item_checked(i, section in _root.get_sections(get_value()))
 		i += 1
-	
-	_popup_menu.add_separator("General")
-	i += 1
-
-	# Generals have id of 1
-	_popup_menu.add_check_item("Visible")
-	_popup_menu.set_item_checked(i, _setting.visibility)
-	_popup_menu.set_item_id(i, 1)
-	i += 1
 	
 	var popup_size = _popup_menu.size
 	_popup_menu.popup(Rect2(get_global_mouse_position(), popup_size))
@@ -155,16 +124,11 @@ func _on_popup_menu_index_pressed(index: int):
 
 	if id == 0:
 		if !checked:
-			_root.add_scene_to_list(text, get_key(), get_value(), ItemSetting.default())
+			_root.add_scene_to_list(text, get_key(), get_value())
 			_root.item_added_to_list.emit(self, text)
 		else:
 			_root.remove_scene_from_list(text, get_key(), get_value())
 			_root.item_removed_from_list.emit(self, text)
-	elif id == 1:
-		if text == "Visible":
-			var new_visibility = !get_visibility()
-			set_visibility(new_visibility)
-			_root.item_visibility_changed.emit(self, new_visibility)
 
 
 # Updates the value of `key` when the user is typing it in.
@@ -179,7 +143,7 @@ func _update_key(text: String) -> void:
 # Runs by hand in `_on_key_gui_input` function when text of key LineEdit
 # changes and key event of it was released
 func _on_key_value_text_changed() -> void:
-	_root.update_all_scene_with_key(_key, get_key(), get_value(), _setting, [get_parent().get_parent()])
+	_root.update_all_scene_with_key(_key, get_key(), get_value(), [get_parent().get_parent()])
 
 
 # Called by the UI when the text changes
@@ -219,23 +183,3 @@ func _submit_key() -> void:
 	if _previous_key != _key:
 		_root.item_renamed.emit(self, _previous_key, _key)
 		_previous_key = _key
-
-
-# When added
-func _on_tree_entered():
-	if _sub_section:
-		_sub_section.child_entered()
-
-
-# When deleted
-func _on_tree_exited():
-	if _sub_section:
-		_sub_section.child_exited()
-
-
-# Returns grab data
-func _get_drag_data(at_position: Vector2) -> Variant:
-	return {
-		"node": self,
-		"parent": _sub_section,
-	}

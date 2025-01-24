@@ -2,7 +2,7 @@
 extends Control
 
 # Nodes
-@onready var _button: Button = find_child("Button")
+@onready var _button_header: Button = find_child("Button")
 @onready var _delete_button: Button = find_child("Delete")
 @onready var _list: VBoxContainer = find_child("List")
 
@@ -12,13 +12,14 @@ const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 
 var _root: Node = self
 var _is_closable: bool = true
+var _header_visible: bool = false
 
 
 # If it is "All" subsection, open it
 func _ready() -> void:
-	_button.text = name
-	if name == "All" && get_child_count() == 0:
-		visible = false
+	_button_header.text = name
+	_button_header.visible = _header_visible
+	visible = true
 
 
 # Add child
@@ -35,13 +36,13 @@ func remove_item(item: Node) -> void:
 # Open list
 func open() -> void:
 	_list.visible = true
-	_button.icon = SUBSECTION_OPEN_ICON
+	_button_header.icon = SUBSECTION_OPEN_ICON
 
 
 # Close list
 func close() -> void:
 	_list.visible = false
-	_button.icon = SUBSECTION_CLOSE_ICON
+	_button_header.icon = SUBSECTION_CLOSE_ICON
 
 
 # Returns list of items
@@ -52,7 +53,7 @@ func get_items() -> Array:
 # Close Open Functionality
 func _on_button_up():
 	if _is_closable:
-		if _button.icon == SUBSECTION_OPEN_ICON:
+		if _button_header.icon == SUBSECTION_OPEN_ICON:
 			close()
 		else:
 			open()
@@ -64,12 +65,12 @@ func _check_count():
 		if name == "All":
 			visible = false
 		else:
-			enable_delete_button()
+			enable_delete_button(true)
 	else:
 		if name == "All":
 			visible = true
 		else:
-			disable_delete_button()
+			enable_delete_button(false)
 
 
 # When a node adds
@@ -87,14 +88,9 @@ func hide_delete_button():
 	_delete_button.visible = false
 
 
-# Disables delete button
-func disable_delete_button():
-	_delete_button.disabled = true
-
-
-# Enables delete button
-func enable_delete_button():
-	_delete_button.disabled = false
+## Enables/disables the delete button for deleting the sub section.
+func enable_delete_button(enable: bool) -> void:
+	_delete_button.disabled = not enable
 
 
 ## Sets whether or not the subsection can close.
@@ -102,39 +98,15 @@ func set_closable(can_close: bool) -> void:
 	_is_closable = can_close
 
 	if _is_closable:
-		_button.icon = SUBSECTION_OPEN_ICON if _list.visible else SUBSECTION_CLOSE_ICON
+		_button_header.icon = SUBSECTION_OPEN_ICON if _list.visible else SUBSECTION_CLOSE_ICON
 	else:
-		_button.icon = null
+		_button_header.icon = null
 
 
-# Returns if we can drop here or not
-func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
-	if !(data is Dictionary):
-		return false
-	data = data as Dictionary
-	return data.has("node") and data.has("parent")
-
-
-# Function to actually do the dropping
-func _drop_data(at_position: Vector2, data: Variant) -> void:
-	data = data as Dictionary
-	var parent = data["parent"] as Node
-	var node = data["node"] as Node
-	var setting = node.get_setting() as ItemSetting
-	if parent == self:
-		return
-	parent.remove_item(node)
-	node.set_subsection(self)
-	add_item(node)
-	open()
-	if name == "All":
-		node.set_setting(ItemSetting.default())
-		_root.added_to_sub_section.emit(node, self)
-		return
-	_root.added_to_sub_section.emit(node, self)
-	setting.subsection = name
-	node.set_setting(setting)
-	_root.sub_section_removed.emit(self)
+## Sets whether or not the button on top for the sub section is visible.
+func set_header_visible(visible: bool) -> void:
+	_header_visible = visible
+	_button_header.visible = _header_visible
 
 
 # Button Delete 

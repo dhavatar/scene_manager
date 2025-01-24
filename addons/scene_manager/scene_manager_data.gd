@@ -132,7 +132,6 @@ func remove_section(section_name: String) -> void:
 	for key in scenes:
 		if scenes[key]["sections"].has(section_name):
 			scenes[key]["sections"].erase(section_name)
-			scenes[key]["settings"].erase(section_name)
 
 
 ## Adds `section_name` to associate to `scene_address`.
@@ -150,7 +149,6 @@ func add_scene_to_section(scene_address: String, section_name: String) -> void:
 	for key in scenes:
 		if scenes[key]["value"] == scene_address:
 			scenes[key]["sections"].append(section_name)
-			scenes[key]["settings"][section_name] = ItemSetting.default().as_dictionary()
 			break
 
 
@@ -354,11 +352,9 @@ func _refresh_scenes() -> void:
 	
 	# Loop through the remaining paths and add these new scenes with default values.
 	# Note that the dictionary value is the default scene name derived from the file.
-	var default_setting := ItemSetting.default().as_dictionary()
 	for address in scenes_to_add:
 		var new_data := {
 			"sections": [],
-			"settings": { "All": default_setting },
 			"value": address
 		}
 

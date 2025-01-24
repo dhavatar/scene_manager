@@ -22,14 +22,11 @@ const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/F
 @onready var _refresh_button: Button = self.find_child("refresh")
 @onready var _auto_save_button: Button = self.find_child("auto_save")
 # add list
-@onready var _add_subsection_button: Button = self.find_child("add_subsection")
 @onready var _add_section_button: Button = self.find_child("add_section")
 @onready var _section_name_line_edit: LineEdit = self.find_child("section_name")
 # add include
 @onready var _address_line_edit: LineEdit = self.find_child("address")
 @onready var _file_dialog: FileDialog = self.find_child("file_dialog")
-@onready var _hide_button: Button = self.find_child("hide")
-@onready var _hide_unhide_button: Button = self.find_child("hide_unhide")
 @onready var _add_button: Button = self.find_child("add")
 # containers
 @onready var _tab_container: TabContainer = self.find_child("tab_container")
@@ -45,9 +42,7 @@ signal item_renamed(node: Node, previous_name: String, new_name: String)
 signal item_visibility_changed(node: Node, visibility: bool)
 signal item_added_to_list(node: Node, list_name: String)
 signal item_removed_from_list(node: Node, list_name: String)
-signal sub_section_removed(node: Node)
 signal section_removed(node: Node, section_name: String)
-signal added_to_sub_section(node: Node, sub_section: Node)
 
 
 func _ready() -> void:
@@ -62,9 +57,7 @@ func _ready() -> void:
 	self.item_visibility_changed.connect(_on_item_visibility_changed)
 	self.item_added_to_list.connect(_on_added_to_list)
 	self.item_removed_from_list.connect(_on_item_removed_from_list)
-	self.sub_section_removed.connect(_on_sub_section_removed)
 	self.section_removed.connect(_on_section_removed)
-	self.added_to_sub_section.connect(_on_added_to_sub_section)
 
 	# Create a new Timer node to write to the scenes.gd file when the timer ends
 	_autosave_timer = Timer.new()
@@ -81,16 +74,8 @@ func _on_data_changed() -> void:
 		_data.save()
 
 
-func _on_added_to_sub_section(node: Node, sub_section: Node) -> void:
-	_on_data_changed()
-
-
 func _on_section_removed(node: Node, section_name: String) -> void:
 	_data.remove_section(section_name)
-	_on_data_changed()
-
-
-func _on_sub_section_removed(node: Node) -> void:
 	_on_data_changed()
 
 
@@ -154,12 +139,6 @@ func get_all_lists_names_except(excepts: Array = [""]) -> Array:
 	return arr
 
 
-# Returns names of all sublists from UI and active tab
-func get_all_sublists_names_except(excepts: Array = [""]) -> Array:
-	var section = _tab_container.get_child(_tab_container.current_tab)
-	return section.get_all_sublists()
-
-
 # Clears scenes inside a UI list
 func _clear_scenes_list(name: String) -> void:
 	var list: Node = _get_scene_list_node_by_name(name)
@@ -217,11 +196,11 @@ func remove_scene_from_list(section_name: String, scene_name: String, scene_addr
 ## This function is used in `scene_item.gd` script and plus doing what it is supposed
 ## to do, removes and again adds the item in `All` section so that it can be placed
 ## in correct place in correct section.
-func add_scene_to_list(list_name: String, scene_name: String, scene_address: String, setting: ItemSetting) -> void:
+func add_scene_to_list(list_name: String, scene_name: String, scene_address: String) -> void:
 	var list: Node = _get_scene_list_node_by_name(list_name)
 	if list == null:
 		return
-	await list.add_item(scene_name, scene_address, setting)
+	await list.add_item(scene_name, scene_address)
 
 
 # Adds an address to the include list
@@ -256,11 +235,9 @@ func _reload_ui_scenes() -> void:
 	for key in _data.scenes:
 		var scene = _data.scenes[key]
 		for section in scene["sections"]:
-			var settings := ItemSetting.dictionary_to_item_setting(scene["settings"][section])
-			add_scene_to_list(section, key, scene["value"], settings)
+			add_scene_to_list(section, key, scene["value"])
 		
-		var all_settings := ItemSetting.dictionary_to_item_setting(scene["settings"]["All"])
-		add_scene_to_list("All", key, scene["value"], all_settings)
+		add_scene_to_list("All", key, scene["value"])
 
 	_sort_scenes_in_lists()
 
@@ -296,10 +273,10 @@ func _on_refresh_button_up() -> void:
 ## Gets called by other nodes in UI
 ##
 ## Updates name of all scene_key.
-func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: String, setting: ItemSetting, except_list: Array = []):
+func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: String, except_list: Array = []):
 	for list in _get_lists_nodes():
 		if list not in except_list:
-			list.update_scene_with_key(scene_key, scene_new_key, value, setting)
+			list.update_scene_with_key(scene_key, scene_new_key, value)
 
 
 ## Checks for duplications in scenes of lists
@@ -395,7 +372,6 @@ func _on_add_section_button_up():
 		_data.add_section(_section_name_line_edit.text)
 
 		_section_name_line_edit.text = ""
-		_add_subsection_button.disabled = true
 		_add_section_button.disabled = true
 
 		_on_data_changed()
@@ -408,47 +384,10 @@ func _on_section_name_text_changed(new_text):
 	else:
 		_add_section_button.disabled = true
 
-	if new_text != "" && _tab_container.get_child(_tab_container.current_tab).name != "All" && !(new_text.capitalize() in get_all_sublists_names_except()):
-		_add_subsection_button.disabled = false
-	else:
-		_add_subsection_button.disabled = true
-
-
-func _hide_unhide_includes_list(value: bool) -> void:
-	if value:
-		_hide_button.icon = ICON_HIDE_BUTTON_CHECKED
-		_hide_unhide_button.icon = ICON_HIDE_BUTTON_CHECKED
-		_include_container.visible = true
-		_include_panel_container.visible = true
-		_hide_unhide_button.visible = false
-	else:
-		_hide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
-		_hide_unhide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
-		_include_container.visible = false
-		_include_panel_container.visible = false
-		_hide_unhide_button.visible = true
-
-
-# Hide Button
-func _on_hide_button_up():
-	_data.includes_visible = not _data.includes_visible
-	_hide_unhide_includes_list(_data.includes_visible)
-	_on_data_changed()
-
 
 # Tab changes
 func _on_tab_container_tab_changed(tab: int):
 	_on_section_name_text_changed(_section_name_line_edit.text)
-
-
-# Add SubSection Button
-func _on_add_subsection_button_up():
-	if _section_name_line_edit.text != "":
-		var section = _tab_container.get_child(_tab_container.current_tab)
-		section.add_subsection(_section_name_line_edit.text)
-		_section_name_line_edit.text = ""
-		_add_subsection_button.disabled = true
-		_add_section_button.disabled = true
 
 
 func _change_auto_save_state(value: bool) -> void:

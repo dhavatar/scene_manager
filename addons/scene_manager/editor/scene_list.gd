@@ -6,14 +6,10 @@ const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 const SUB_SECTION = preload("res://addons/scene_manager/editor/sub_section.tscn")
 # Duplicate/invalid + normal scene theme
 const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
-# Open close icons
-const EYE_OPEN = preload("res://addons/scene_manager/icons/eye_open.png")
-const EYE_CLOSE = preload("res://addons/scene_manager/icons/eye_close.png")
 
 # variables
 @onready var _container: VBoxContainer = find_child("container")
 @onready var _delete_list_button: Button = find_child("delete_list")
-@onready var _hidden_button: Button = find_child("hidden")
 
 var _root: Node = self
 var _main_subsection: Node = null
@@ -35,6 +31,7 @@ func _ready() -> void:
 	if self.name == "All":
 		_delete_list_button.icon = null
 		_delete_list_button.disabled = true
+		_delete_list_button.visible = false
 		_delete_list_button.focus_mode = Control.FOCUS_NONE
 
 	var sub = SUB_SECTION.instantiate()
@@ -50,30 +47,16 @@ func _ready() -> void:
 	sub.call_deferred("set_closable", false if name == "All" else true)
 
 
-## Determines item can be visible with current settings or not
-func determine_item_visibility(setting: ItemSetting) -> bool:
-	return true if _hidden_button.icon == EYE_CLOSE && !setting.visibility else true if _hidden_button.icon == EYE_OPEN && setting.visibility else false
-
-
 ## Adds an item to list
-func add_item(key: String, value: String, setting: ItemSetting) -> void:
-	if !self.is_node_ready():
+func add_item(key: String, value: String) -> void:
+	if not self.is_node_ready():
 		await self.ready
+	
 	var item = SCENE_ITEM.instantiate()
 	item.set_key(key)
 	item.set_value(value)
-	item.set_setting(setting)
-	item.visible = determine_item_visibility(setting)
 	item._list = self
-
-	if setting.subsection != "":
-		var subsection = find_subsection(setting.subsection)
-		if subsection:
-			subsection.add_item(item)
-		else:
-			add_subsection(setting.subsection).add_item(item)
-	else:
-		_main_subsection.add_item(item)
+	_main_subsection.add_item(item)
 
 
 ## Updates the item key with the new key.
@@ -134,12 +117,8 @@ func clear_list() -> void:
 ## Input example:
 ## {"scene_key": "scene_address", "scene_key": "scene_address", ...}
 func append_scenes(nodes: Dictionary) -> void:
-	if name == "All":
-		for key in nodes:
-			add_item(key, nodes[key], ItemSetting.new(true, _root.has_sections(nodes[key])))
-	else:
-		for key in nodes:
-			add_item(key, nodes[key], ItemSetting.default())
+	for key in nodes:
+		add_item(key, nodes[key])
 
 
 ## Sort the scenes in all the subsections alphabetically based on the scene key name.
@@ -194,13 +173,12 @@ func get_node_by_scene_address(scene_address: String) -> Node:
 
 
 ## Update a specific scene record with passed data in UI
-func update_scene_with_key(key: String, new_key: String, value: String, setting: ItemSetting) -> void:
+func update_scene_with_key(key: String, new_key: String, value: String) -> void:
 	for i in range(_container.get_child_count()):
 		var children: Array[Node] = _container.get_child(i).get_items()
 		for j in range(len(children)):
 			if children[j].get_key() == key && children[j].get_value() == value:
 				children[j].set_key(new_key)
-				children[j].set_setting(setting)
 
 
 ## Checks duplication in current list and return their scene addresses in an array from UI
@@ -261,21 +239,3 @@ func _on_delete_list_button_up() -> void:
 	queue_free()
 	await self.tree_exited
 	_root.section_removed.emit(self, section_name)
-
-
-# Refreshes `visible` of all items in list
-func _refresh_visible_of_all_items() -> void:
-	for i in range(_container.get_child_count()):
-		var children: Array[Node] = _container.get_child(i).get_items()
-		for j in range(len(children)):
-			children[j].visible = determine_item_visibility(children[j].get_setting())
-
-
-# Hidden Button
-func _on_hidden_button_up():
-	if _hidden_button.icon == EYE_OPEN:
-		_hidden_button.icon = EYE_CLOSE
-		_refresh_visible_of_all_items()
-	elif _hidden_button.icon == EYE_CLOSE:
-		_hidden_button.icon = EYE_OPEN
-		_refresh_visible_of_all_items()
