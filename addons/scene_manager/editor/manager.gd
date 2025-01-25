@@ -12,8 +12,8 @@ const SCENE_LIST_ITEM = preload("res://addons/scene_manager/editor/scene_list.ts
 # Icons
 const ICON_HIDE_BUTTON_CHECKED = preload("res://addons/scene_manager/icons/GuiChecked.svg")
 const ICON_HIDE_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/GuiCheckedDisabled.svg")
-const ICON_FOLDER_BUTTON_CHECKED = preload("res://addons/scene_manager/icons/FolderActive.svg")
-const ICON_FOLDER_BUTTON_UNCHECKED = preload("res://addons/scene_manager/icons/Folder.svg")
+const ICON_EXPAND_BUTTON = preload("res://addons/scene_manager/icons/Expand.svg")
+const ICON_COLLAPSE_BUTTON = preload("res://addons/scene_manager/icons/Collapse.svg")
 
 const ALL_LIST_NAME := "All" ## Default list that contains all scenes
 
@@ -54,7 +54,8 @@ func _ready() -> void:
 	# Refreshes the UI with the latest data
 	_on_refresh_button_up()
 	_change_auto_save_state(_data.auto_save)
-
+	_show_includes_list(_data.includes_visible)
+	
 	self.include_child_deleted.connect(_on_include_child_deleted)
 	self.item_renamed.connect(_on_item_renamed)
 	self.item_added_to_list.connect(_on_added_to_list)
@@ -287,6 +288,7 @@ func _refresh_save_changes() -> void:
 
 # Refresh button
 func _on_refresh_button_up() -> void:
+	_data.load()
 	_clear_all()
 	_reload_ui_tabs()
 	_reload_ui_scenes()
@@ -409,16 +411,17 @@ func _on_section_name_text_changed(new_text):
 		_add_section_button.disabled = true
 
 
-func _hide_unhide_includes_list(value: bool) -> void:
+# If set true, then the include list will be shown. If false, the list will be hidden.
+func _show_includes_list(value: bool) -> void:
 	if value:
-		_hide_button.icon = ICON_HIDE_BUTTON_CHECKED
-		_hide_unhide_button.icon = ICON_HIDE_BUTTON_CHECKED
+		_hide_button.icon = ICON_COLLAPSE_BUTTON
+		_hide_unhide_button.icon = ICON_COLLAPSE_BUTTON
 		_include_container.visible = true
 		_include_panel_container.visible = true
 		_hide_unhide_button.visible = false
 	else:
-		_hide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
-		_hide_unhide_button.icon = ICON_HIDE_BUTTON_UNCHECKED
+		_hide_button.icon = ICON_EXPAND_BUTTON
+		_hide_unhide_button.icon = ICON_EXPAND_BUTTON
 		_include_container.visible = false
 		_include_panel_container.visible = false
 		_hide_unhide_button.visible = true
@@ -427,7 +430,7 @@ func _hide_unhide_includes_list(value: bool) -> void:
 # Hide Button
 func _on_hide_button_up():
 	_data.includes_visible = not _data.includes_visible
-	_hide_unhide_includes_list(_data.includes_visible)
+	_show_includes_list(_data.includes_visible)
 	_on_data_changed()
 
 

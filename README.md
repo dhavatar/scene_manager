@@ -1,4 +1,4 @@
-# Scene Manager (dahs Edition)
+# Scene Manager
 
 ## In Progress
 **Current Changes**:
@@ -9,78 +9,54 @@
 **TODO**:
 - Design API for modular loading screens without hard coding transitions in the scene manager itself
 - Further clean up the code to remove the loading scene related code.
-- Update icon for this addon
-- Update the README with the changes
+
+<p align="center">
+<img src="icon.svg" width=256/>
+</p>
+
+A tool to manage transition between different scenes for Godot 4, featuring an editor for adding scenes and an auto-generated scene file.
 
 Auto-complete node incorporated and modified from https://github.com/Lenrow/line-edit-complete-godot by Lenrow.
 
-<p align="center">
-<img src="icon.png"/>
-</p>
-
-A tool to manage transition between different scenes.\
-Scene Manager v1.X.X and v2.X.X is compatible with Godot 3.\
-Scene Manager v3.X.X is compatible with Godot 4.
-
 ## Features
 
-**Recently Added**:
-
-* [X] Pause and Resume functions added
-* [X] Reactive button added which makes the `Scene Manager UI` reactive to changes on `File System` of godot and refreshes the `Scene Manager UI` automatically every time an update happens on files in `res://` location
-* [X] Auto Save button added which saves automatically every time a new change found in `Scene Manager UI` + If Reactive is enabled too, after that mechanism, save gets called automatically so that there would be no need to use the save button at all
-
-**All**:
-
-* [X] A fully responsive tool menu structure to manage and categorize your scene
-* [X] Save button that saves all scenes in a dictionary
-* [X] Refresh button that refreshes the tool with latest saved status of the scenes
-* [X] List duplication check for keys
-* [X] Smooth transition between scenes
-* [X] Ignore folder feature in UI ignores all scenes inside that specific folder that you added in the ignore list
-* [X] Categorization for scenes
-* [X] Ignore folder section can hide optionally
-* [X] Change to previous scenes is possible
-* [X] Fully customizable transitions
-* [X] Customizable way of entering the first scene of the game
-* [X] Reset `Scene Manager` function to assume the current scene as the first ever seen scene (to ignore previous scenes and don't go back to them by changing scene to the previous scene)
-* [X] Arrangeable scene categories(they will reset to alphabetic order after refresh or save button pressed)
-* [X] Fade in and fade out with different desired patterns
-* [X] You can create instance of a scene just by calling the scene with a key
-* [X] Transition is so much customizable
-* [X] `SceneManager` tool will ignore scenes inside folders with `.gdignore` file beside them
-* [X] Loading scenes interactive is possible. (Loading scene code example added)
-* [X] Ability to limit how much deep scene manager is allowed to record previous scenes which affects in changing scene to `back`(previous scene) functionality
-* [X] Ability to hide scenes in a list (Just Godot4)
-* [X] Ignoring a specific scene in ignores list section is possible (Just Godot4)
-* [X] sublist in lists of scene manager UI is now possible (Just Godot4)
-* [X] `no_effect_change_scene` function added (Just Godot4)
-* [X] Node can be added to `change_scene` and `no_effect_change_scene` functions (Just Godot4)
-* [X] Possibility to specify path scenes.db via Project/Settings (Just Godot4)
-* [X] 5 new signals added:
-  * scene_changed
+* A tool menu structure to manage and categorize your scene in the editor
+* Duplication check for scene names and list names
+* Include folder feature in UI to only add scenes in the specified folder or the scene file itself
+* Categorization for scenes
+* Can go back to a previous scene using the ring buffer the `Scene Manager` tracks. Size of the ring buffer can be adjusted.
+* Reset `Scene Manager` function to assume the current scene as the first ever seen scene and resetting the back buffer
+* Default fade in and fade out to black built-in
+* You can create instance of a scene just by calling the scene with a key
+* Project/Settings includes addon settings to customize the `Scene Manager`
+  * Can specify the location of the `scene.gd` file that's generated
+  * Global default fade in and out times for the built-in fade transition
+  * Auto save is an internal property setting the addon uses to keep track of whether or not to automatically save changes made to the scene manager tool
+* Support for the following signals to get information throughout the scene loading:
+  * load_finished
+  * load_percent_changed(value: int)
+  * scene_loaded
   * fade_in_started
   * fade_out_started
   * fade_in_finished
   * fade_out_finished
-* [X] Added a feature to navigate to the scene path in filesystem on godot when clicked on scene address in Scene Manager tool
-* [X] Added a feature to open a desired scene from Scene Manager tab
-* [X] Users now can have some time to load their scene in the background with the new changing scene functionality
+* Ability to navigate to the scene path in filesystem on godot when clicked on scene address in Scene Manager tool
+* Can open a desired scene from Scene Manager tab
 
 ## How To Use?
 
 1. Copy and paste `scene_manager` folder which is inside `addons` folder. (don't change the `scene_manager` folder name)
 2. From editor toolbar, choose **`Project > Project Settings...`** then in **`Plugins`** tab, activate scene_manager plugin.
-3. Use `Scene Manager` tab on right side of the screen(on default godot theme view) to manage your scenes.
+3. Use `Scene Manager` tab on right side of the screen (on default godot theme view) to manage your scenes.
 4. After you are done with managing your scenes, always **save** your changes so that your changes have effect inside your actual game.
 
-**Note**: After activating `Scene Manager` tool, you have access to **SceneManager** script globally from anywhere in your scripts and you can use it to change scenes and ... (for more information, read [SceneManager](#scenemanager) section)
-**Note**: This tool saves your scenes data inside `res://addons/scene_manager/scenes.gd` file, if you want to have your latest changes and avoid redefining your scene keys, **do not** remove it, **do not** change it or modify it in anyway.
+> **Note**: After activating `Scene Manager` tool, you have access to **SceneManager** script globally from anywhere in your scripts. For more information, read [SceneManager](#scenemanager) section.
+
+> **Note**: This tool saves your scenes data inside `res://scenes.gd` file by default. If you want to have your latest changes and avoid redefining your scene keys, **do not** remove it, **do not** change it or modify it in anyway.
 
 ## Tool View
 
-**Note**: All demo pictures and gifs are from Godot4 UI.
-This is the tool that you will see on your right side of the godot editor after activating `scene_manager` plugin. By **Add Category** button under scenes categories you can create new categories to manage your scenes.
+This is the tool that you will see on your right side of the godot editor after activating `scene_manager` plugin. With the **Add** button under scenes categories, you can create new categories to manage your scenes which will show up as tabs. Note that it will notify you if there's unsaved changes to the scene information in the top right corner. Scenes can be loaded directly with the button on the right.
 
 <p align="center">
 <img src="images/tool.png"/>
@@ -88,49 +64,29 @@ This is the tool that you will see on your right side of the godot editor after 
 
 ### Double key checker
 
-If editing of a scene key causes at least two keys of another scene match, both of them will get red color and you have to fix the duplication, otherwise the plugin does not work properly as you expect it to work.
+If editing of a scene key causes at least two keys of another scene match, both of them will get red color and you have to fix the duplication, otherwise the plugin does not work properly as you expect it to work. Editing scene keys will also automatically normalize the formatting as you type to lower case and underscores as spaces to keep everything in the same style and make it valid to store in a dictionary. Symbols and other invalid characters can't be entered and will be stripped out.
 
 <p align="center">
 <img src="images/tool_double_key.png"/>
 </p>
 
-### Ignore Folder
+### Include Folder
 
-Every folder that is added inside this section will be ignored and scenes inside them will not get included inside scenes categories section(the section above this section).
+Every folder and file that is added inside this section will be included and scenes inside them will get added to the tool with default keys matching the file name.
 
 <p align="center">
-<img src="images/ignore.png"/>
+<img src="images/include.png"/>
 </p>
 
 ## Scene Menu
 
-Every scene has a button beside them which will open up a menu to configure settings of that specific scene.
+Every scene has a button beside them which will open up a menu to configure the category of that specific scene.
 
 <p align="center">
-<img src="./images/menu.png"/>
+<img src="images/menu.png"/>
 </p>
-
-## Hide (Just Godot4)
-
-From menu of every scene, you can visible or hide scenes and see just hidden or visible scenes in lists by clicking on eye icon at the top of list categories.
-
-<p align="center">
-<img src="./images/tool_hidden.png"/>
-</p>
-
-## SubList (Just Godot4)
-
-As it is visible on previous pictures, it is possible to add sublists in lists and categorize different scenes in different sublists.
-
-All you have to do is drag scenes by their buttons on the left and drop them on other sublists.
 
 # Demo
-
-Just a simple demo to show some abilities of this addon:
-
-<p align="center">
-<img src="./images/demo.gif"/>
-</p>
 
 ## Demo Description
 
@@ -143,7 +99,7 @@ Just a simple demo to show some abilities of this addon:
 
 ## Demo Code
 
-**Note**: You can use `SceneManager` node in your game after you activated `scene_manager` plugin.
+> **Note**: You can use `SceneManager` node in your game after you activated `scene_manager` plugin.
 
 ### Simple Example Without any Loading Screen
 

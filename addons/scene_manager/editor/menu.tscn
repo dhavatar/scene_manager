@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://crnf0w0s44hxx"]
+[gd_scene load_steps=9 format=3 uid="uid://crnf0w0s44hxx"]
 
 [ext_resource type="PackedScene" path="res://addons/scene_manager/editor/label.tscn" id="2"]
 [ext_resource type="Texture2D" uid="uid://ivkx00aag348" path="res://addons/scene_manager/icons/FileDialog.svg" id="3"]
+[ext_resource type="Texture2D" uid="uid://c5n03kbxn5gko" path="res://addons/scene_manager/icons/Collapse.svg" id="4_vqnpn"]
 [ext_resource type="Texture2D" uid="uid://dbtlwmxj4c644" path="res://addons/scene_manager/icons/Reload.svg" id="5_2r30m"]
 [ext_resource type="Texture2D" uid="uid://bnwaksnompvr7" path="res://addons/scene_manager/icons/Save.svg" id="5_yw87d"]
 [ext_resource type="Script" path="res://addons/scene_manager/editor/manager.gd" id="6"]
@@ -119,13 +120,17 @@ size_flags_horizontal = 3
 [node name="add" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2"]
 layout_mode = 2
 size_flags_horizontal = 3
+tooltip_text = "Adds folder/file to include in the scene data."
 disabled = true
 text = "Add"
 
 [node name="hide" type="Button" parent="main_container/includes/include_panel/include_interactive_section_container/add_include_container/dialog_add_include_container2"]
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
+tooltip_text = "Shows/hides the include section."
 focus_mode = 0
-icon = ExtResource("7_d04a5")
+icon = ExtResource("4_vqnpn")
+icon_alignment = 1
 metadata/enabled = true
 
 [node name="separator" type="HSeparator" parent="main_container/includes/include_panel"]
@@ -148,6 +153,7 @@ size_flags_horizontal = 3
 [node name="refresh" type="Button" parent="main_container/interactive_section_container/margin_refresh_save_container/refresh_save_container/save_refresh_container"]
 layout_mode = 2
 size_flags_horizontal = 3
+tooltip_text = "Reloads the scene data file and refreshes the UI."
 text = "Refresh"
 icon = ExtResource("5_2r30m")
 
@@ -159,6 +165,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 2
+tooltip_text = "Stores all data to the generated scenes.gd file."
 text = "Save"
 icon = ExtResource("5_yw87d")
 
@@ -180,7 +187,7 @@ size_flags_horizontal = 3
 [node name="auto_save" type="Button" parent="main_container/interactive_section_container/margin_refresh_save_container/refresh_save_container/auto_save_refresh_container"]
 layout_mode = 2
 size_flags_horizontal = 3
-tooltip_text = "If some scene properties update (edit, delete, change list or sublist of a scene and ...), save happens automatically."
+tooltip_text = "If some scene properties update (edit, delete, change list, etc.), save happens automatically."
 focus_mode = 0
 text = "Auto Save"
 icon = ExtResource("7_xu84e")

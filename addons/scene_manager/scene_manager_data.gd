@@ -43,6 +43,15 @@ var auto_save: bool:
 		ProjectSettings.save()
 
 
+## Whether or not the editor includes list is visible in the editor tool.
+var includes_visible: bool:
+	get:
+		return ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_INCLUDES_VISIBLE_PROPERTY_NAME, true)
+	set(value):
+		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_INCLUDES_VISIBLE_PROPERTY_NAME, value)
+		ProjectSettings.save()
+
+
 ## Returns the scenes from `scenes` variable of `scenes.gd` file
 var scenes: Dictionary:
 	get:
