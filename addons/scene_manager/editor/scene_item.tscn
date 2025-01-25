@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/scene_manager/editor/scene_item.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://djj6it6ehklel" path="res://addons/scene_manager/icons/GuiTabMenuHl.svg" id="3"]
-[ext_resource type="Texture2D" uid="uid://djg8os8ixd00r" path="res://addons/scene_manager/icons/PlayOverlay.png" id="4_pt2e1"]
+[ext_resource type="Texture2D" uid="uid://c6t3fvn565604" path="res://addons/scene_manager/icons/PlayOverlay.svg" id="3_3ykqm"]
 
 [node name="item" type="HBoxContainer"]
 offset_right = 280.0
@@ -29,7 +29,7 @@ drag_and_drop_selection_enabled = false
 texture_filter = 1
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
-icon = ExtResource("4_pt2e1")
+icon = ExtResource("3_3ykqm")
 
 [node name="popup_menu" type="PopupMenu" parent="."]
 size = Vector2i(100, 28)

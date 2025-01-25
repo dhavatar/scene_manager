@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://b4edho3whn67t"]
 
 [ext_resource type="Script" path="res://addons/scene_manager/editor/sub_section.gd" id="1_kgwwp"]
-[ext_resource type="Texture2D" uid="uid://ccbo8g4xwhtvv" path="res://addons/scene_manager/icons/GuiOptionArrowRight.png" id="1_yyg5g"]
+[ext_resource type="Texture2D" uid="uid://bs7w3mgxrs555" path="res://addons/scene_manager/icons/GuiOptionArrowRight.svg" id="1_yyg5g"]
 [ext_resource type="Script" path="res://addons/scene_manager/editor/sub_section_button.gd" id="3_smgrs"]
 [ext_resource type="Texture2D" uid="uid://btlkp15fo0toa" path="res://addons/scene_manager/icons/ImportFail.svg" id="4_chjuj"]
 

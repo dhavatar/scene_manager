@@ -7,7 +7,7 @@ extends Control
 @onready var _list: VBoxContainer = find_child("List")
 
 const SUBSECTION_OPEN_ICON = preload("res://addons/scene_manager/icons/GuiOptionArrowDown.svg")
-const SUBSECTION_CLOSE_ICON = preload("res://addons/scene_manager/icons/GuiOptionArrowRight.png")
+const SUBSECTION_CLOSE_ICON = preload("res://addons/scene_manager/icons/GuiOptionArrowRight.svg")
 const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 
 var _root: Node = self

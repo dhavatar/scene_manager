@@ -66,7 +66,7 @@ func _enter_tree():
 	add_custom_type("Auto Complete Assistant", 
 			"Node",
 			preload("res://addons/scene_manager/auto_complete_menu_node/scripts/auto_complete_assistant.gd"),
-			preload("res://addons/scene_manager/icons/line-edit-complete-icon.png"))
+			preload("res://addons/scene_manager/icons/line-edit-complete-icon.svg"))
 
 	_menu = preload("res://addons/scene_manager/editor/menu.tscn").instantiate()
 	_menu.name = "Scene Manager"
