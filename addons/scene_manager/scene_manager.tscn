@@ -29,6 +29,7 @@ _data = {
 script = ExtResource("1")
 
 [node name="canvas" type="CanvasLayer" parent="."]
+layer = 100
 
 [node name="fade" type="ColorRect" parent="canvas"]
 anchors_preset = 15
