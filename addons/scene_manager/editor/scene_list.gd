@@ -4,8 +4,6 @@ extends Node
 # Scene item and sub_section to instance and add in list
 const SCENE_ITEM = preload("res://addons/scene_manager/editor/scene_item.tscn")
 const SUB_SECTION = preload("res://addons/scene_manager/editor/sub_section.tscn")
-# Duplicate/invalid + normal scene theme
-const DUPLICATE_LINE_EDIT: StyleBox = preload("res://addons/scene_manager/themes/line_edit_duplicate.tres")
 const ALL_LIST_NAME := "All"
 
 @onready var _container: VBoxContainer = find_child("container")
@@ -68,12 +66,14 @@ func _ready() -> void:
 
 ## Adds an item to list
 func add_item(key: String, value: String, categorized: bool = false) -> void:
-	if not self.is_node_ready():
-		await self.ready
+	if not is_node_ready():
+		await ready
 	
 	var item = SCENE_ITEM.instantiate()
 	item.set_key(key)
 	item.set_value(value)
+	item.key_changed.connect(_on_item_key_changed)
+	item.key_reset.connect(set_reset_theme_for_all)
 	item._list = self
 
 	# For the default All case, determine which sub category it goes into
@@ -144,11 +144,10 @@ func find_subsection(key: String) -> Node:
 
 ## Removes an item from list
 func remove_item(key: String, value: String) -> void:
-	for i in range(_container.get_child_count()):
-		var children: Array = _container.get_child(i).get_items()
-		for j in range(len(children)):
-			if children[j].get_key() == key && children[j].get_value() == value:
-				children[j].queue_free()
+	for scene_item in _container.get_children():
+		for item in scene_item.get_items():
+			if item.get_key() == key && item.get_value() == value:
+				item.queue_free()
 				return
 
 
@@ -163,8 +162,8 @@ func remove_items_begins_with(value: String) -> void:
 
 ## Clear all scene records from UI list
 func clear_list() -> void:
-	for i in range(_container.get_child_count()):
-		_container.get_child(i).queue_free()
+	for scene_item in _container.get_children():
+		scene_item.queue_free()
 
 
 ## Appends all scenes into UI list[br]
@@ -203,73 +202,52 @@ func _sort_node_list(parent: Node) -> void:
 func get_list_nodes() -> Array:
 	if _container == null:
 		_container = find_child("container")
+	
 	var arr: Array[Node] = []
-	for i in range(_container.get_child_count()):
-		var nodes = _container.get_child(i).get_items()
+	for scene_item in _container.get_children():
+		var nodes = scene_item.get_items()
 		arr.append_array(nodes)
 	return arr
 
 
 ## Returns a specific node from passed scene name
 func get_node_by_scene_name(scene_name: String) -> Node:
-	for i in range(_container.get_child_count()):
-		var items = _container.get_child(i).get_items()
-		for j in range(len(items)):
-			if items[j].get_key() == scene_name:
-				return items[j]
+	for scene_item in _container.get_children():
+		for item in scene_item.get_items():
+			if item.get_key() == scene_name:
+				return item
 	return null
 
 
 ## Returns a specific node from passed scene address
 func get_node_by_scene_address(scene_address: String) -> Node:
-	for i in range(_container.get_child_count()):
-		var items = _container.get_child(i).get_items()
-		for j in range(len(items)):
-			if items[j].get_value() == scene_address:
-				return items[j]
+	for scene_item in _container.get_children():
+		for item in scene_item.get_items():
+			if item.get_value() == scene_address:
+				return item
 	return null
 
 
 ## Update a specific scene record with passed data in UI
 func update_scene_with_key(key: String, new_key: String, value: String) -> void:
 	for i in range(_container.get_child_count()):
-		var children: Array[Node] = _container.get_child(i).get_items()
-		for j in range(len(children)):
-			if children[j].get_key() == key && children[j].get_value() == value:
-				children[j].set_key(new_key)
-
-
-## Checks duplication in current list and return their scene addresses in an array from UI
-func check_duplication() -> Array:
-	var all: Array[Node] = get_list_nodes()
-	var arr: Array[String] = []
-	for i in range(len(all)):
-		var j: int = i + 1
-		while j < len(all):
-			var child1: Node = all[i]
-			var child2: Node = all[j]
-			if child1.get_key() == child2.get_key():
-				if !(child1.get_key() in arr):
-					arr.append(child1.get_key())
-			j += 1
-	return arr
+		for item in _container.get_children():
+			if item.get_key() == key && item.get_value() == value:
+				item.set_key(new_key)
 
 
 ## Reset theme for all children in UI
 func set_reset_theme_for_all() -> void:
-	for i in range(_container.get_child_count()):
-		var children: Array[Node] = _container.get_child(i).get_items()
-		for j in range(len(children)):
-			children[j].remove_custom_theme()
+	for list_child in _container.get_children():
+		for c in list_child.get_items():
+			c.remove_custom_theme()
 
 
-## Sets duplicate theme for children in passed list in UI
-func set_duplicate_theme(list: Array) -> void:
-	for i in range(_container.get_child_count()):
-		var children: Array[Node] = _container.get_child(i).get_items()
-		for j in range(len(children)):
-			if children[j].get_key() in list:
-				children[j].custom_set_theme(DUPLICATE_LINE_EDIT)
+## Sets the duplicate theme for the children matching the key.
+func set_duplicate_theme(key: String) -> void:
+	for list_child in _container.get_children():
+		for c in list_child.get_items():
+			c.is_valid = c.get_key() != key
 
 
 ## Sets whether or not to display there's unsaved changes.
@@ -280,8 +258,8 @@ func set_changes_unsaved(changes: bool) -> void:
 ## Returns all names of sublist
 func get_all_sublists() -> Array:
 	var arr: Array[String] = []
-	for i in range(_container.get_child_count()):
-		arr.append(_container.get_child(i).name)
+	for list_child in _container.get_children():
+		arr.append(list_child.name)
 	return arr
 
 
@@ -296,9 +274,14 @@ func add_subsection(text: String) -> Control:
 
 # List deletion
 func _on_delete_list_button_up() -> void:
-	var section_name = self.name
-	if self.name == "All":
+	var section_name = name
+	if name == "All":
 		return
 	queue_free()
-	await self.tree_exited
+	await tree_exited
 	_root.section_removed.emit(self, section_name)
+
+
+# Callback from the key_changed signal in the scene_item
+func _on_item_key_changed(key: String) -> void:
+	_root.check_duplication(key, self)

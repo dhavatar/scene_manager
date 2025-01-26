@@ -18,24 +18,24 @@ const ICON_COLLAPSE_BUTTON = preload("res://addons/scene_manager/icons/Collapse.
 const ALL_LIST_NAME := "All" ## Default list that contains all scenes
 
 # UI nodes and items
-@onready var _include_list: Node = self.find_child("include_list")
+@onready var _include_list: Node = find_child("include_list")
 # add save, refresh
-@onready var _save_button: Button = self.find_child("save")
-@onready var _refresh_button: Button = self.find_child("refresh")
-@onready var _auto_save_button: Button = self.find_child("auto_save")
+@onready var _save_button: Button = find_child("save")
+@onready var _refresh_button: Button = find_child("refresh")
+@onready var _auto_save_button: Button = find_child("auto_save")
 # add list
-@onready var _add_section_button: Button = self.find_child("add_section")
-@onready var _section_name_line_edit: LineEdit = self.find_child("section_name")
+@onready var _add_section_button: Button = find_child("add_section")
+@onready var _section_name_line_edit: LineEdit = find_child("section_name")
 # add include
-@onready var _address_line_edit: LineEdit = self.find_child("address")
-@onready var _file_dialog: FileDialog = self.find_child("file_dialog")
-@onready var _hide_button: Button = self.find_child("hide")
-@onready var _hide_unhide_button: Button = self.find_child("hide_unhide")
-@onready var _add_button: Button = self.find_child("add")
+@onready var _address_line_edit: LineEdit = find_child("address")
+@onready var _file_dialog: FileDialog = find_child("file_dialog")
+@onready var _hide_button: Button = find_child("hide")
+@onready var _hide_unhide_button: Button = find_child("hide_unhide")
+@onready var _add_button: Button = find_child("add")
 # containers
-@onready var _tab_container: TabContainer = self.find_child("tab_container")
-@onready var _include_container: Node = self.find_child("includes")
-@onready var _include_panel_container: Node = self.find_child("include_panel")
+@onready var _tab_container: TabContainer = find_child("tab_container")
+@onready var _include_container: Node = find_child("includes")
+@onready var _include_panel_container: Node = find_child("include_panel")
 
 var _data: SceneManagerData = SceneManagerData.new()
 var _autosave_timer: Timer = null ## Timer for autosave when the key changes
@@ -56,11 +56,11 @@ func _ready() -> void:
 	_change_auto_save_state(_data.auto_save)
 	_show_includes_list(_data.includes_visible)
 	
-	self.include_child_deleted.connect(_on_include_child_deleted)
-	self.item_renamed.connect(_on_item_renamed)
-	self.item_added_to_list.connect(_on_added_to_list)
-	self.item_removed_from_list.connect(_on_item_removed_from_list)
-	self.section_removed.connect(_on_section_removed)
+	include_child_deleted.connect(_on_include_child_deleted)
+	item_renamed.connect(_on_item_renamed)
+	item_added_to_list.connect(_on_added_to_list)
+	item_removed_from_list.connect(_on_item_removed_from_list)
+	section_removed.connect(_on_section_removed)
 
 	# Create a new Timer node to write to the scenes.gd file when the timer ends
 	_autosave_timer = Timer.new()
@@ -298,23 +298,22 @@ func _on_refresh_button_up() -> void:
 ## Gets called by other nodes in UI
 ##
 ## Updates name of all scene_key.
-func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: String, except_list: Array = []):
+func update_all_scene_with_key(scene_key: String, scene_new_key: String, value: String, except_list: Array = []) -> void:
 	for list in _get_lists_nodes():
 		if list not in except_list:
 			list.update_scene_with_key(scene_key, scene_new_key, value)
 
 
-## Checks for duplications in scenes of lists
-func check_duplication():
-	var list: Array = _get_scene_list_node_by_name(ALL_LIST_NAME).check_duplication()
-	for node in _get_lists_nodes():
-		node.set_reset_theme_for_all()
-		if list:
-			node.set_duplicate_theme(list)
+## Checks for duplications in the scene data.[br]
+## key is the new key to check against the current scene data to see if there's a duplicate.[br]
+## scene_list is the list the item being changed is located.
+func check_duplication(key: String, scene_list: Node) -> void:
+	if key in _data.scenes:
+		scene_list.set_duplicate_theme(key)
 
 
 # Save button
-func _on_save_button_up():
+func _on_save_button_up() -> void:
 	_data.save()
 	_refresh_save_changes()
 

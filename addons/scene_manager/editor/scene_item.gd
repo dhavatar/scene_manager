@@ -10,6 +10,20 @@ const INVALID_KEY_NAME: String = "none"
 @onready var _key_edit: LineEdit = get_node("key")
 @onready var _key: String = get_node("key").text
 
+signal key_changed(key: String)
+signal key_reset
+
+## Returns whether or not the key in the scene item is valid
+var is_valid: bool:
+	get:
+		return is_valid
+	set(value):
+		is_valid = value
+		if value:
+			remove_custom_theme()
+		else:
+			custom_set_theme(DUPLICATE_LINE_EDIT)
+
 var _sub_section: Control
 var _list: Control
 var _mouse_is_over_value: bool
@@ -161,12 +175,6 @@ func _on_key_text_submitted(new_text:String) -> void:
 	_submit_key()
 
 
-# Checks to see if the key is something invalid for an enum value.
-func _check_invalid_values() -> void:
-	if _key.is_empty() or _key == INVALID_KEY_NAME:
-		custom_set_theme(DUPLICATE_LINE_EDIT)
-
-
 # When a gui_input happens on LineEdit, this function triggers
 func _on_key_gui_input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -174,12 +182,17 @@ func _on_key_gui_input(event: InputEvent) -> void:
 			return
 		
 		# Runs when InputEventKey is released
-		_root.check_duplication()
-		_check_invalid_values()
+		if _previous_key != _key:
+			key_changed.emit(_key)
+		is_valid = is_valid and not _key.is_empty() and _key != INVALID_KEY_NAME
 
 
 # Emits a signal if the key value is different than it was at the start
 func _submit_key() -> void:
 	if _previous_key != _key:
-		_root.item_renamed.emit(self, _previous_key, _key)
-		_previous_key = _key
+		if is_valid:
+			_root.item_renamed.emit(self, _previous_key, _key)
+			_previous_key = _key
+		else:
+			set_key(_previous_key)
+			key_reset.emit()
