@@ -43,15 +43,6 @@ var auto_save: bool:
 		ProjectSettings.save()
 
 
-## Whether or not the editor includes list is visible in the editor tool.
-var includes_visible: bool:
-	get:
-		return ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_INCLUDES_VISIBLE_PROPERTY_NAME, true)
-	set(value):
-		ProjectSettings.set_setting(SceneManagerConstants.SETTINGS_INCLUDES_VISIBLE_PROPERTY_NAME, value)
-		ProjectSettings.save()
-
-
 ## Returns the scenes from `scenes` variable of `scenes.gd` file
 var scenes: Dictionary:
 	get:
@@ -70,7 +61,8 @@ var sections: Array:
 		return _data[SECTIONS_KEY]
 
 
-## Returns true if there's been changes that haven't been saved.
+## Returns true if there's been changes that haven't been saved.[br]
+## Note this only works in the editor. Does not function in a build.
 var has_changes: bool:
 	get:
 		return not _file_data.recursive_equal(_data, 3)
@@ -215,7 +207,7 @@ func save() -> void:
 	# Keep track of invalid enums so there aren't blank names that make the generated enum invalid
 	var invalid_name := "INVALID"
 	var num_invalid: int = 0
-	for key: String in _data[SCENE_DATA_KEY].keys():
+	for key: String in _data.scenes.keys():
 		if key == "":
 			write_data += "\n\t%s%d, " % [invalid_name, num_invalid]
 			num_invalid += 1
@@ -235,14 +227,23 @@ func save() -> void:
 
 ## Loads all data in the `scenes.gd` file.
 func load() -> void:
-	_data = _load_file()
-	_file_data = _data.duplicate(true)
+	# Note that loading is different in the editor vs a build.
+	# The build may not have access to the file system compared to the editor, but this
+	# is why the file itself is a script, so we have access to the data directly.
+	# If this is the editor, it loads extra data for the editor tool UI.
+	# If this is a build, then the _data will point to the `Scenes.scenes` dictionary
+	# directly and the `_data` can be used as normal.
+	if Engine.is_editor_hint():
+		_data = _load_file()
+		_file_data = _data.duplicate(true)
 
-	# Create the section cache based on the scene data
-	_sections.clear()
-	for key in scenes:
-		for section in scenes[key]["sections"]:
-			add_scene_to_section(scenes[key]["value"], section)
+		# Create the section cache based on the scene data
+		_sections.clear()
+		for key in scenes:
+			for section in scenes[key]["sections"]:
+				add_scene_to_section(scenes[key]["value"], section)
+	else:
+		_data = Scenes.scenes
 
 
 # Internal function for loading the data from the `scene.gd` file.
@@ -341,9 +342,9 @@ func _get_scenes_helper(root_path: String) -> Dictionary:
 
 # Removes all scenes in the data that is part of the path.
 func _remove_scenes(path: String) -> void:
-	for scene in _data[SCENE_DATA_KEY].keys():
-		if _data[SCENE_DATA_KEY][scene]["value"].begins_with(path):
-			_data[SCENE_DATA_KEY].erase(scene)
+	for scene in _data.scenes.keys():
+		if _data.scenes[scene]["value"].begins_with(path):
+			_data.scenes.erase(scene)
 
 
 # Refreshes the scene dictionary with the latest includes when the include path changes.
@@ -354,14 +355,14 @@ func _refresh_scenes() -> void:
 	# The address is the key as this will be used for lookup. The scene name was the key
 	# will be useful for the removal as the data uses that as the key.
 	var data_files := {}
-	for key in _data[SCENE_DATA_KEY]:
-		data_files[_data[SCENE_DATA_KEY][key]["value"]] = key
+	for key in _data.scenes:
+		data_files[_data.scenes[key]["value"]] = key
 
 	# Loops through the scene addresses in the data to see if there's any scenes that should be
 	# removed due to not being in the include paths.
 	for address in data_files:
 		if not address in include_scenes:
-			_data[SCENE_DATA_KEY].erase(data_files[address])
+			_data.scenes.erase(data_files[address])
 	
 	# Subtract the included_scenes with the data_files to find the paths that are not currently
 	# in the data. These will be added to the data.
@@ -378,7 +379,7 @@ func _refresh_scenes() -> void:
 			"value": address
 		}
 
-		_data[SCENE_DATA_KEY][scenes_to_add[address]] = new_data
+		_data.scenes[scenes_to_add[address]] = new_data
 
 
 # Subtracts two dictionaries and returns the result.
