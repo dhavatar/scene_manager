@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://4ww1s3pdeqel"]
 
-[ext_resource type="Script" path="res://demo/button.gd" id="1"]
-[ext_resource type="Script" path="res://addons/scene_manager/scene_resource.gd" id="2_kckjn"]
+[ext_resource type="Script" uid="uid://c4qhx0sd62v0p" path="res://demo/button.gd" id="1"]
+[ext_resource type="Script" uid="uid://dkhiyifvpb81o" path="res://addons/scene_manager/scene_resource.gd" id="2_kckjn"]
 
 [sub_resource type="Resource" id="Resource_1cdln"]
 script = ExtResource("2_kckjn")

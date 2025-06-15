@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bal2cvrrckfs1"]
 
-[ext_resource type="Script" path="res://addons/scene_manager/auto_complete_menu_node/scripts/auto_complete_assistant.gd" id="1_qnd4x"]
+[ext_resource type="Script" uid="uid://btabfwj4vodlm" path="res://addons/scene_manager/auto_complete_menu_node/scripts/auto_complete_assistant.gd" id="1_qnd4x"]
 
 [node name="LineEditExample" type="Control"]
 layout_mode = 3

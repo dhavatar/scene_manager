@@ -1,9 +1,28 @@
-[gd_scene load_steps=4 format=3 uid="uid://bdcja8idnw3bu"]
+[gd_scene load_steps=10 format=3 uid="uid://bdcja8idnw3bu"]
 
-[ext_resource type="Script" path="res://demo/loading_phase_mechanic.gd" id="1_eqil7"]
-[ext_resource type="FontFile" path="res://addons/demo/fonts/Fake Identity.ttf" id="1_ewqw2"]
-[ext_resource type="Script" path="res://demo/button.gd" id="2_chu1e"]
+[ext_resource type="Script" uid="uid://cv73mwfmv07ab" path="res://demo/loading_phase_mechanic.gd" id="1_eqil7"]
+[ext_resource type="Script" uid="uid://c4qhx0sd62v0p" path="res://demo/button.gd" id="2_chu1e"]
 
+[sub_resource type="Resource" id="Resource_a0tu5"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_w36by"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_hq266"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_i1ul4"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_q8ipf"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_dkg0n"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
+
+[sub_resource type="Resource" id="Resource_ab3c2"]
+metadata/__load_path__ = "res://addons/demo/fonts/Fake Identity.ttf"
 
 [node name="SceneWithLoadingPhase" type="Control"]
 layout_mode = 3
@@ -36,7 +55,7 @@ theme_override_constants/separation = 15
 [node name="loading_scene" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(200, 150)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_a0tu5")
 theme_override_font_sizes/font_size = 32
 text = "LOADING SCREEN"
 script = ExtResource("2_chu1e")
@@ -57,7 +76,7 @@ theme_override_constants/separation = 15
 [node name="next_scene" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(200, 150)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_w36by")
 theme_override_font_sizes/font_size = 32
 text = "SPECIAL
 
@@ -79,7 +98,7 @@ theme_override_constants/separation = 15
 [node name="reset" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_hq266")
 theme_override_font_sizes/font_size = 32
 text = "RESET"
 script = ExtResource("2_chu1e")
@@ -88,7 +107,7 @@ scene = "ignore"
 [node name="reload" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_i1ul4")
 theme_override_font_sizes/font_size = 32
 text = "RELOAD"
 script = ExtResource("2_chu1e")
@@ -99,7 +118,7 @@ fade_in_speed = 0.2
 [node name="back" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_q8ipf")
 theme_override_font_sizes/font_size = 32
 text = "BACK"
 script = ExtResource("2_chu1e")
@@ -110,7 +129,7 @@ fade_in_speed = 0.0
 [node name="nothing" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_dkg0n")
 theme_override_font_sizes/font_size = 32
 text = "NOTHING"
 script = ExtResource("2_chu1e")
@@ -122,7 +141,7 @@ timeout = 0.5
 [node name="exit" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_ewqw2")
+theme_override_fonts/font = SubResource("Resource_ab3c2")
 theme_override_font_sizes/font_size = 32
 text = "EXIT"
 script = ExtResource("2_chu1e")
