@@ -275,88 +275,62 @@ func _on_timeout():
 
 ### Methods
 
-This is the node you use inside your game code and it has these functions:
-
-1. `validate_scene`(**key**: String) -> void:
-   * Checks and validates passed **key** in scenes keys. (breaks game if key doesn't exist in scenes keys)
-2. `validate_pattern`(**key**: String) -> void:
-   * Checks and validates passed **key** in patterns keys. (breaks game if key doesn't exist in patterns keys)
-3. `safe_validate_scene`(**key**: String) -> bool:
-   * Safely validates the scene key and does not break the game.
-4. `safe_validate_pattern`(**key**: String) -> bool:
-    * Safely validates the pattern key and does not break the game.
-5. `change_scene`(**scene**: String or PackedScene or Node, **fade_out_options**: Options, **fade_in_options**: Options, **general_options**: GeneralOptions) -> void:
-   * Changes scene if scene is valid, otherwise nothing happens.
-   * **fade_out_options** and **fade_in_options** are some configurations you can put in the function to customize your fade_in to the scene or fade_out of the current scene and you can create `Options` objects by calling `create_options` function.
-   * **general_options** are common configurations that effect transition in both fade_in and fade_out transitions and you can create `GeneralOptions` by calling `create_general_options` functions.
-   * **Note**: `back` as value of scene variable, causes going back to previous scene.
-   * **Note**: `null`, `ignore` or an empty string as value of scene variable, causes nothing but just showing scene transition and does not change scenes at all.
-   * **Note**: `refresh`, `reload` or `restart` as value of scene variable, causes refreshing the current scene.
-   * **Note**: `exit` or `quit` as value of scene variable, causes exiting out of the game.
-   * **Note**: Any String value as **scene** variable which starts with an `_` will be ignored.
-6. `no_effect_change_scene`(**scene**: String or PackedScene or Node, **hold_timeout**: float = 0.0, **add_to_back**: bool = true) -> void:
-   * Changes scene if scene is valid without effects, otherwise nothing happens.
-   * **hold_timeout** is the timeout before changing to the scene.
-   * **add_to_back** determines if we can go back to this scene or not.
-   * **Note**: This method is for advanced users to actually apply their own effects and just change scenes with scene manager.
-7. `create_options`(**fade_speed**: float = 1, **fade_pattern**: String = "fade", **smoothness**: float = 0.1, **inverted**: bool = false) -> Options:
-   * Creates `Options` object for `change_scene` function.
-   * **fade_speed** = speed of fading out of the scene or fading into the scene in seconds.
-   * **fade_pattern** = name of a shader pattern which is in `addons/scene_manager/shader_patterns` folder for fading out or fading into the scene. (if you use `fade` or an empty string, it causes a simple fade screen transition)
-   * **smoothness** = defines roughness of pattern's edges. (this value is between 0-1 and more near to 1, softer edges and more near to 0, harder edges)
-   * **inverted** = inverts the pattern.
-8. `create_general_options`(**color**: Color = Color(0, 0, 0), **timeout**: float = 0, **clickable**: bool = true, **add_to_back**: bool = true) -> GeneralOptions:
-   * **color** = color for the whole transition.
-   * **timeout** = between this scene and next scene, there would be a gap which can take much longer that usual(default is 0) by your choice by changing this option.
-   * **clickable** = makes the scene behind the transition visuals clickable or not.
-   * **add_to_back** = if true, you can go back to current scene after changing scene to next scene by going to "back" scene which means previous scene.
-9. `show_first_scene`(**fade_in_options**: Options, **general_options**: GeneralOptions) -> void:
-    * Call this method inside `_ready` function of a node with a script which that node is inside the first scene that game jumps into it and this causes to have a smooth transition into the first game scene.
-    * This function works just once at the beginning of the first game scene. After that, if you call this function again, nothing happens.
-    * **fade_in_options** = creates it by calling `create_options` function.
-    * **general_options** = creates it by calling `create_general_options` function.
-10. `reset_scene_manager`() -> void:
-    * Sets current active scene as a starting point so that we can't go back to previous scenes with changing scene to `back` scene.
-11. `create_scene_instance`(**key**: String) -> Node:
-    * Returns scene instance of passed scene key (blocking)
-12. `set_back_limit`(**input**: int) -> void:
+1. `set_back_limit`(**input**: int) -> void:
     * Limits how much deep scene manager is allowed to record previous scenes which affects in changing scene to `back`(previous scene) functionality.
     * Allowed `input` values:
-      1. input = -1 => unlimited (default)
-      2. input =  0 => we can not go back to any previous scenes
-      3. input >  0 => we can go back to `input` or less previous scenes
-13. `get_scene`(**key**: String) -> PackedScene:
+      1. input =  0 => we can not go back to any previous scenes
+      2. input >  0 => we can go back to `input` or less previous scenes
+2. `clear_back_buffer`() -> void:
+    * Clears the back buffer and resets the ring buffer.
+3. `create_load_options`(
+    - **node**: String = DEFAULT_TREE_NODE_NAME,
+    - **mode**: SceneLoadingMode = SceneLoadingMode.SINGLE,
+    - **clickable**: bool = true,
+    - **fade_out_time**: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_OUT_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_OUT_TIME),
+    - **fade_in_time**: float = ProjectSettings.get_setting(SceneManagerConstants.SETTINGS_FADE_IN_PROPERTY_NAME, SceneManagerConstants.DEFAULT_FADE_IN_TIME),
+    - **add_to_back**: bool = true
+    <br>) -> SceneLoadOptions:
+   * Creates `SceneLoadOptions` object for `load_scene` function.
+4. `create_scene_instance`(**key**: Scenes.SceneName, **use_sub_threads** = false) -> Node:
+    * Returns scene instance of passed scene key (blocking)
+5. `get_scene`(**key**: Scenes.SceneName, **use_sub_threads** = false) -> PackedScene:
     * Returns PackedScene of passed scene key (blocking)
-14. `load_scene_interactive`(**key**: String) -> void:
+6. `load_scene`(**scene**: Scenes.SceneName, **load_options**: SceneLoadOptions = create_load_options()) -> void:
+    * Loads the scene if scene enum isn't None, otherwise nothing happens.
+    * Optional **load_options** contains configurations you can modify to adjust the scene loading behavior. If not provided, a default one will be created. The options available are the node name, loading mode, fade out time, fade in time, whether it's clickable, and whether to add it to the back ring buffer.
+7. `unload_scene`(**scene**: Scenes.SceneName) -> void:
+    * Unloads the specified scene from the tree.
+    * Throws an assert error if the scene hasn't been loaded.
+8. `go_back`() -> void:
+    * Changes the scene back to the previous in `SINGLE` mode.
+9. `reload_current_scene`() -> void:
+    * Reloads the currently loaded scene.
+10. `exit_game`() -> void:
+    * Exits the game completely.
+11. `add_loaded_scene_to_scene_tree`() -> void:
+    * Imports loaded scene into the scene tree but doesn't change the current scene
+    * Mainly used when your new loaded scene has a loading phase when added to scene tree
+    * So to use this, first has to call `load_scene_interactive` to load your scene and then have to listen on `load_finished` signal and after the signal emits, you call this function and this function adds the loaded scene to the scene tree but exactly behind the current scene so that you still can not see the new scene
+12. `change_scene_to_existing_scene_in_scene_tree`(**load_options**: SceneLoadOptions = create_load_options()) -> void:
+    * When you added the loaded scene to the scene tree by `add_loaded_scene_to_scene_tree` function, you call this function after you are sure that the added scene to scene tree is completely ready and functional to change the active scene
+13. `load_scene_interactive`(**key**: Scenes.SceneName, **use_sub_threads** = false) -> void:
     * Loads scene interactive.
     * **Note**: Connect to `load_percent_changed(value: int)` and `load_finished` signals to listen to updates on your scene loading status.
-15. `get_loaded_scene`() -> PackedScene:
-    * Returns loaded scene.
-    * **Note**: If scene is not loaded, blocks and waits until scene is ready. (acts blocking in code and may freeze your game, make sure scene is ready to get)
-16. `change_scene_to_loaded_scene`(**fade_out_options**: Options, **fade_in_options**: Options, **general_options**: GeneralOptions) -> void:
+14. `get_loaded_scene`() -> PackedScene:
+    * Returns the loaded scene. If the scene isn't loaded, will block and wait until the loaded scene is ready.
+15. `change_scene_to_loaded_scene`(**load_options**: SceneLoadOptions) -> void:
     * Changes scene to interactively loaded scene.
-    * Checkout function number 5 (`change_scene`) to understand what **fade_out_options**, **fade_in_options** and **general_options** are.
-17. `get_previous_scene`() -> String:
-    * Returns previous scene. (the scene before current scene)
-18. `get_previous_scene_at`(**index**: int) -> String:
-    * Returns a specific previous scene at an exact index position
-19. `pop_previous_scene`() -> String:
-    * Returns previous scene and removes it from list of previous scenes.
-20. `previous_scenes_length`() -> int:
+16. `pop_previous_scene`() -> Scenes.SceneName:
+    * Pops from the back stack and returns previous scene (scene before current scene)
+17. `previous_scenes_length`() -> int:
     * Returns how many scenes there are in list of previous scenes.
-21. `set_recorded_scene`(**key**: String) -> void:
+18. `set_recorded_scene`(**key**: Scenes.SceneName) -> void:
     * Records a scene key to be used for loading scenes to know where to go after getting loaded into loading scene or just for next scene to know where to go next.
-22. `get_recorded_scene`() -> String:
+19. `get_recorded_scene`() -> Scenes.SceneName:
     * Returns recorded scene by `set_recorded_scene` function.
-23. `add_loaded_scene_to_scene_tree`() -> void:
-    * Imports loaded scene into the scene tree but doesn't change the current scene
-    * Maily used when your new loaded scene has a loading phase when added to scene tree
-    * So to use this, first has to call `load_scene_interactive` to load your scene and then have to listen on `load_finished` signal and after the signal emits, you call this function and this function adds the loaded scene to the scene tree but exactly behind the current scene so that you still can not see the new scene
-24. `change_scene_to_existing_scene_in_scene_tree`(**fade_out_options**: Options, **fade_in_options**: Options, **general_options**: GeneralOptions) -> void:
-    * When you added the loaded scene to the scene tree by `add_loaded_scene_to_scene_tree` function, you call this function after you are sure that the added scene to scene tree is completely ready and functional to change the active scene
-25. `pause`(**fade_out_options**: Options, **general_options**: GeneralOptions) -> void:
+20. `pause`(**fade_out_time**: float, **general_options**: SceneLoadOptions = create_load_options()) -> void:
     * Just executes the fade out animation.
     * Use it with `resume` function when you need to do something but do not want the player to see it.
-26. `resume`(**fade_in_options**: Options, **general_options**: GeneralOptions) -> void:
+21. `resume`(**fade_in_time**: float, **general_options**: SceneLoadOptions = create_load_options()) -> void:
     * Just executes the fade in animation.
     * Use it with `pause` function when you need to do something but do not want the player to see it.
