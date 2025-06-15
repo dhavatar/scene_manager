@@ -1,11 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://4ww1s3pdeqel"]
+[gd_scene load_steps=7 format=3 uid="uid://4ww1s3pdeqel"]
 
 [ext_resource type="Script" uid="uid://c4qhx0sd62v0p" path="res://demo/button.gd" id="1"]
+[ext_resource type="Script" uid="uid://cmc7dyew4x3rp" path="res://demo/sample_load_timer.gd" id="1_pjhhy"]
 [ext_resource type="Script" uid="uid://dkhiyifvpb81o" path="res://addons/scene_manager/scene_resource.gd" id="2_kckjn"]
 
 [sub_resource type="Resource" id="Resource_1cdln"]
 script = ExtResource("2_kckjn")
-string_value = "LOADING"
+string_value = "SCENE2"
 
 [sub_resource type="Resource" id="Resource_eu1f2"]
 script = ExtResource("2_kckjn")
@@ -23,6 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("1_pjhhy")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 0
@@ -124,9 +126,6 @@ theme_override_font_sizes/font_size = 32
 text = "EXIT"
 script = ExtResource("1")
 fade_out_speed = 0.3
-
-[node name="check" type="CheckButton" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
 
 [connection signal="button_up" from="CenterContainer/VBoxContainer/loading_scene" to="CenterContainer/VBoxContainer/loading_scene" method="_on_loading_scene_button_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/next_scene" to="CenterContainer/VBoxContainer/HBoxContainer/next_scene" method="_on_button_button_up"]

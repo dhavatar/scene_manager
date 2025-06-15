@@ -5,7 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_tef5p"]
 script = ExtResource("2_yvd4w")
-string_value = "LOADING"
+string_value = "SCENE3"
 
 [sub_resource type="Resource" id="Resource_lmp1c"]
 script = ExtResource("2_yvd4w")
@@ -44,7 +44,6 @@ custom_minimum_size = Vector2(200, 150)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "LOADING
-
 SCREEN"
 script = ExtResource("1")
 scene = SubResource("Resource_tef5p")
@@ -117,9 +116,6 @@ theme_override_font_sizes/font_size = 32
 text = "EXIT"
 script = ExtResource("1")
 fade_out_speed = 0.3
-
-[node name="check" type="CheckButton" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
 
 [connection signal="button_up" from="CenterContainer/VBoxContainer/loading_scene" to="CenterContainer/VBoxContainer/loading_scene" method="_on_loading_scene_button_up"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/HBoxContainer/next_scene" to="CenterContainer/VBoxContainer/HBoxContainer/next_scene" method="_on_button_button_up"]
