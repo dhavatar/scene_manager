@@ -24,6 +24,31 @@ func _on_button_additive_up():
 	options.fade_out_time = 0
 	SceneManager.load_scene(scene.scene_value, options)
 
+
+func _on_button_additive_node_up():
+	if scene == null:
+		return
+	
+	var options := SceneManager.SceneLoadOptions.new()
+	options.mode = SceneManager.SceneLoadingMode.ADDITIVE
+	options.node_name = "SAMPLE_NODE"
+	options.fade_in_time = 0
+	options.fade_out_time = 0
+	SceneManager.load_scene(scene.scene_value, options)
+
+
+func _on_button_single_node_up():
+	if scene == null:
+		return
+	
+	var options := SceneManager.SceneLoadOptions.new()
+	options.mode = SceneManager.SceneLoadingMode.SINGLE_NODE
+	options.node_name = "SAMPLE_NODE"
+	options.fade_in_time = 0
+	options.fade_out_time = 0
+	SceneManager.load_scene(scene.scene_value, options)
+
+
 func _on_reset_button_up():
 	SceneManager.clear_back_buffer()
 
@@ -32,22 +57,14 @@ func _on_loading_scene_button_up():
 	if scene == null:
 		return
 	
-	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.load_scene(Scenes.SceneName.LOADING)
+	SceneManager.load_scene_with_transition(scene.scene_value, Scenes.SceneName.LOADING)
 
 
 func _on_loading_scene_initialization_button_up():
 	if scene == null:
 		return
 	
-	SceneManager.set_recorded_scene(scene.scene_value)
-	SceneManager.load_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION)
-
-
-func _on_pause_and_resume_button_up():
-	await SceneManager.pause(fade_out_speed)
-	await get_tree().create_timer(3).timeout
-	await SceneManager.resume(fade_in_speed)
+	SceneManager.load_scene_with_transition(scene.scene_value, Scenes.SceneName.LOADING_WITH_INITIALIZATION)
 
 
 func _on_back_pressed() -> void:

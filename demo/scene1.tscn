@@ -46,12 +46,11 @@ layout_mode = 2
 theme_override_constants/separation = 15
 
 [node name="loading_scene" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 150)
+custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 32
-text = "LOADING
-SCREEN"
+text = "Loading Scene"
 script = ExtResource("1")
 scene = SubResource("Resource_1cdln")
 fade_in_speed = 2.0
@@ -110,12 +109,15 @@ mode = 1
 fade_out_speed = 0.5
 fade_in_speed = 0.5
 
-[node name="pause_and_resume" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="load_additively2" type="Button" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "PAUSE 3 SECONDS"
+text = "Load Additive under
+SAMPLE_NODE"
 script = ExtResource("1")
+scene = SubResource("Resource_krcu7")
+mode = 1
 fade_out_speed = 0.5
 fade_in_speed = 0.5
 
@@ -133,5 +135,5 @@ fade_out_speed = 0.3
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/reload" method="_on_reload_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/back" method="_on_back_pressed"]
 [connection signal="button_up" from="CenterContainer/VBoxContainer/load_additively" to="CenterContainer/VBoxContainer/load_additively" method="_on_button_additive_up"]
-[connection signal="button_up" from="CenterContainer/VBoxContainer/pause_and_resume" to="CenterContainer/VBoxContainer/loading_scene" method="_on_pause_and_resume_button_up"]
+[connection signal="button_up" from="CenterContainer/VBoxContainer/load_additively2" to="CenterContainer/VBoxContainer/load_additively2" method="_on_button_additive_node_up"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/exit" to="CenterContainer/VBoxContainer/exit" method="_on_exit_pressed"]

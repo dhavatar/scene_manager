@@ -23,6 +23,7 @@ var _load_scene: String = "" ## Scene path that is currently loading
 var _load_scene_enum: Scenes.SceneName = Scenes.SceneName.NONE ## Scene Enum of the scene that's currently loading
 var _load_progress: Array = []
 var _recorded_scene: Scenes.SceneName = Scenes.SceneName.NONE
+var _recorded_load_options: SceneLoadOptions
 var _loaded_scene_map: Dictionary = {} ## Keeps track of all loaded scenes (SceneName key) and the node they belong to in an array (parent node: Node, scene node: Node)
 var _data: SceneManagerData = SceneManagerData.new()
 
@@ -413,9 +414,9 @@ func exit_game() -> void:
 ## Imports loaded scene into the scene tree but doesn't change the scene.
 ## Mainly used when your new loaded scene has a loading phase when added to scene tree
 ## so to use this, first has to call `load_scene_interactive` to load your scene
-## and then have to listen on `load_finished` signal and after the signal emits,
+## and then have to listen on `load_finished` signal. After the signal emits,
 ## you call this function and this function adds the loaded scene to the scene
-## tree but exactly behind the current scene so that you still can not see the new scene
+## tree but exactly behind the current scene so that you still can not see the new scene.
 func add_loaded_scene_to_scene_tree() -> void:
 	if _load_scene != "":
 		var scene_resource = ResourceLoader.load_threaded_get(_load_scene) as PackedScene
@@ -484,6 +485,17 @@ func load_scene_interactive(key: Scenes.SceneName, use_sub_threads = false) -> v
 	ResourceLoader.load_threaded_request(_load_scene, "", use_sub_threads, ResourceLoader.CACHE_MODE_IGNORE)
 
 
+## Loads a scene with a loading/transition scene.[br]
+##
+## This sets the recorded scene to the specified next_scene and loads the transition_scene.
+## The transition_scene is the loading scene that should subscribe to the `load_finished` signal
+func load_scene_with_transition(next_scene: Scenes.SceneName,
+		transition_scene: Scenes.SceneName,
+		load_options: SceneLoadOptions = create_load_options()) -> void:
+	set_recorded_scene(next_scene, load_options)
+	load_scene(transition_scene, load_options)
+
+
 ## Returns the loaded scene.[br]
 ##
 ## If scene is not loaded, blocks and waits until scene is ready (acts blocking in code
@@ -514,13 +526,19 @@ func previous_scenes_length() -> int:
 
 ## Records a scene key to be used for loading scenes to know where to go after getting loaded
 ## into loading scene or just for next scene to know where to go next.
-func set_recorded_scene(key: Scenes.SceneName) -> void:
+func set_recorded_scene(key: Scenes.SceneName, load_options: SceneLoadOptions = create_load_options()) -> void:
 	_recorded_scene = key
+	_recorded_load_options = load_options
 
 
-## Returns recorded scene
+## Returns the recorded scene.
 func get_recorded_scene() -> Scenes.SceneName:
 	return _recorded_scene
+
+
+## Returns the recorded load options for the recorded scene.
+func get_recorded_load_option() -> SceneLoadOptions:
+	return _recorded_load_options
 
 
 ## Pause (fadeout). You can resume afterwards.
