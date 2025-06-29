@@ -9,9 +9,15 @@ extends Button
 
 
 func _on_button_button_up():
+	if scene == null:
+		return
+	
 	SceneManager.load_scene(scene.scene_value)
 
 func _on_button_additive_up():
+	if scene == null:
+		return
+	
 	var options := SceneManager.SceneLoadOptions.new()
 	options.mode = SceneManager.SceneLoadingMode.ADDITIVE
 	options.fade_in_time = 0
@@ -23,11 +29,17 @@ func _on_reset_button_up():
 
 
 func _on_loading_scene_button_up():
+	if scene == null:
+		return
+	
 	SceneManager.set_recorded_scene(scene.scene_value)
 	SceneManager.load_scene(Scenes.SceneName.LOADING)
 
 
 func _on_loading_scene_initialization_button_up():
+	if scene == null:
+		return
+	
 	SceneManager.set_recorded_scene(scene.scene_value)
 	SceneManager.load_scene(Scenes.SceneName.LOADING_WITH_INITIALIZATION)
 

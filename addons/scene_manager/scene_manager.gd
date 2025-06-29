@@ -410,8 +410,8 @@ func exit_game() -> void:
 	get_tree().quit(0)
 
 
-## Imports loaded scene into the scene tree but doesn't change the scene
-## mainly used when your new loaded scene has a loading phase when added to scene tree
+## Imports loaded scene into the scene tree but doesn't change the scene.
+## Mainly used when your new loaded scene has a loading phase when added to scene tree
 ## so to use this, first has to call `load_scene_interactive` to load your scene
 ## and then have to listen on `load_finished` signal and after the signal emits,
 ## you call this function and this function adds the loaded scene to the scene
